@@ -21,11 +21,7 @@
       --font-display: 'Space Grotesk', sans-serif;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background-color: var(--bg);
@@ -88,7 +84,6 @@
       border-radius: 1rem;
       padding: 1.75rem;
       box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-      position: relative;
     }
 
     .card h2 {
@@ -183,6 +178,10 @@
       margin-bottom: 1.5rem;
     }
 
+    @media (max-width: 520px) {
+      .result-grid { grid-template-columns: 1fr; }
+    }
+
     .result-item {
       background: #090a0f;
       padding: 0.85rem;
@@ -197,7 +196,7 @@
     }
 
     .result-item strong {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       color: #fff;
     }
 
@@ -229,7 +228,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
       width: 100%;
       background: var(--green);
       color: #fff;
@@ -251,7 +249,7 @@
   <header>
     <div class="badge">Graves Pesados • 011 SP</div>
     <h1>PAREDÃO <span>011</span></h1>
-    <p>Locação de estrutura completa de som automotivo para chácaras, festas e eventos na Grande SP.</p>
+    <p>Locação de estrutura completa de som automotivo para festas e eventos na Grande SP.</p>
   </header>
 
   <main>
@@ -260,13 +258,13 @@
       <p class="subtitle">Base de saída: Itaquera (CEP 08260-280) • Média: 15 km/l</p>
 
       <div class="info-box">
-        Inclui taxa fixa de serviço e montagem (R$ 300,00) + custo de combustível calculado para o trajeto completo (ida e volta).
+        Inclui taxa fixa de serviço e montagem (R$ 300,00) + custo de combustível (ida e volta).
       </div>
 
       <div class="form-group">
         <label for="dest-cep">CEP do Local do Evento</label>
         <div class="input-row">
-          <input type="text" id="dest-cep" placeholder="00000-000" maxlength="9">
+          <input type="text" id="dest-cep" placeholder="00000-000" maxlength="9" inputmode="numeric">
           <button class="btn-calc" id="btn-calcular" onclick="processarOrcamento()">Calcular</button>
         </div>
         <div id="status" class="status-msg"></div>
@@ -305,12 +303,11 @@
   </main>
 
   <script>
-    const ORIGIN_CEP = "08260280";
-    const ORIGIN_COORDS = { lat: -23.5593, lon: -46.4636 }; // Itaquera / Cidade Líder
+    const ORIGIN_COORDS = { lat: -23.5593, lon: -46.4636 }; // Itaquera (08260-280)
     const SERVICO_FIXO = 300.00;
     const KM_POR_LITRO = 15.0;
-    const PRECO_LITRO_GASOLINA = 6.00;
-    const NUMERO_WHATSAPP = "5511999999999"; // Substitua pelo seu WhatsApp comercial
+    const PRECO_LITRO = 6.00;
+    const NUMERO_WHATSAPP = "5511999999999"; // Coloque seu número aqui com DDD
 
     const cepInput = document.getElementById("dest-cep");
     cepInput.addEventListener("input", (e) => {
@@ -333,6 +330,46 @@
       return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
     }
 
+    async function buscarDadosCep(cep) {
+      // 1. Tenta ViaCEP
+      try {
+        const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await res.json();
+        if (!data.erro && data.erro !== "true") {
+          return {
+            endereco: `${data.bairro || data.logradouro || 'Região Central'}, ${data.localidade} - ${data.uf}`,
+            cidade: data.localidade,
+            bairro: data.bairro || "",
+            logradouro: data.logradouro || "",
+            uf: data.uf,
+            coords: null
+          };
+        }
+      } catch (e) {
+        console.warn("ViaCEP falhou, tentando AwesomeAPI...");
+      }
+
+      // 2. Fallback: AwesomeAPI (já entrega latitude e longitude prontas!)
+      try {
+        const res2 = await fetch(`https://cep.awesomeapi.com.br/json/${cep}`);
+        const data2 = await res2.json();
+        if (data2 && data2.city) {
+          return {
+            endereco: `${data2.district || data2.address || 'Região Central'}, ${data2.city} - ${data2.state}`,
+            cidade: data2.city,
+            bairro: data2.district || "",
+            logradouro: data2.address || "",
+            uf: data2.state,
+            coords: (data2.lat && data2.lng) ? { lat: parseFloat(data2.lat), lon: parseFloat(data2.lng) } : null
+          };
+        }
+      } catch (e) {
+        console.warn("AwesomeAPI falhou.");
+      }
+
+      return null;
+    }
+
     async function processarOrcamento() {
       const cleanCep = cepInput.value.replace(/\D/g, "");
       if (cleanCep.length !== 8) {
@@ -340,68 +377,68 @@
         return;
       }
 
-      showStatus("Consultando CEP e calculando trajeto...", "loading");
+      showStatus("Consultando CEP e calculando frete...", "loading");
       document.getElementById("result").style.display = "none";
 
-      try {
-        const viacepRes = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
-        const viacepData = await viacepRes.json();
+      const info = await buscarDadosCep(cleanCep);
+      if (!info) {
+        showStatus("CEP de destino não encontrado. Verifique os números digitados.", "error");
+        return;
+      }
 
-        if (viacepData.erro) {
-          showStatus("CEP de destino não encontrado.", "error");
-          return;
-        }
+      let destCoords = info.coords;
 
-        const endereco = `${viacepData.bairro || viacepData.logradouro || 'Região'}, ${viacepData.localidade} - ${viacepData.uf}`;
-
-        // Geocodificação de destino
-        const geoQuery = encodeURIComponent(`${viacepData.logradouro || ''}, ${viacepData.bairro || ''}, ${viacepData.localidade}, SP, Brasil`);
-        const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${geoQuery}`);
-        const geoData = await geoRes.json();
-
-        let destCoords;
-        if (geoData && geoData.length > 0) {
-          destCoords = { lat: parseFloat(geoData[0].lat), lon: parseFloat(geoData[0].lon) };
-        } else {
-          // Fallback geográfico
-          destCoords = { lat: -23.5505, lon: -46.6333 };
-        }
-
-        // Rota rodoviária real via OSRM
-        let distKmIda = 0;
+      // Se a API não retornou coordenadas prontas, tenta geocodificação aproximada sem travar
+      if (!destCoords) {
         try {
-          const osrmRes = await fetch(`https://router.project-osrm.org/route/v1/driving/${ORIGIN_COORDS.lon},${ORIGIN_COORDS.lat};${destCoords.lon},${destCoords.lat}?overview=false`);
-          const osrmData = await osrmRes.json();
-          if (osrmData.routes && osrmData.routes.length > 0) {
-            distKmIda = osrmData.routes[0].distance / 1000;
-          } else {
-            throw new Error();
+          const termo = encodeURIComponent(`${info.bairro} ${info.cidade} ${info.uf} Brasil`);
+          const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${termo}&limit=1`, {
+            headers: { 'Accept': 'application/json' }
+          });
+          const geoData = await geoRes.json();
+          if (geoData && geoData.length > 0) {
+            destCoords = { lat: parseFloat(geoData[0].lat), lon: parseFloat(geoData[0].lon) };
           }
         } catch (e) {
-          // Fallback Haversine + 30% margem de desvio urbano
-          distKmIda = haversine(ORIGIN_COORDS, destCoords) * 1.3;
+          console.warn("Geocoding falhou, usando aproximação de SP.");
         }
-
-        const distTotal = distKmIda * 2;
-        const litros = distTotal / KM_POR_LITRO;
-        const custoGasolina = litros * PRECO_LITRO_GASOLINA;
-        const valorFinal = SERVICO_FIXO + custoGasolina;
-
-        // Renderiza tela
-        document.getElementById("res-endereco").textContent = endereco;
-        document.getElementById("res-distancia").textContent = `${distTotal.toFixed(1)} km`;
-        document.getElementById("res-gasolina").textContent = `R$ ${custoGasolina.toFixed(2).replace('.', ',')}`;
-        document.getElementById("res-total").textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
-
-        const msgWhats = `Olá! Gostaria de agendar o Paredão 011.\nDestino: ${endereco} (CEP: ${cleanCep})\nDistância Ida/Volta: ${distTotal.toFixed(1)} km\nOrçamento Calculado: R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
-        document.getElementById("btn-whats").href = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(msgWhats)}`;
-
-        showStatus("", "");
-        document.getElementById("result").style.display = "block";
-
-      } catch (err) {
-        showStatus("Erro ao calcular orçamento. Verifique sua conexão e tente novamente.", "error");
       }
+
+      // Fallback geográfico para região central se nada responder
+      if (!destCoords) {
+        destCoords = { lat: -23.5505, lon: -46.6333 };
+      }
+
+      // Cálculo de Distância (Tenta rota real OSRM; se der timeout/bloqueio, usa Haversine + 30%)
+      let distKmIda = 0;
+      try {
+        const osrmRes = await fetch(`https://router.project-osrm.org/route/v1/driving/${ORIGIN_COORDS.lon},${ORIGIN_COORDS.lat};${destCoords.lon},${destCoords.lat}?overview=false`);
+        const osrmData = await osrmRes.json();
+        if (osrmData.routes && osrmData.routes.length > 0) {
+          distKmIda = osrmData.routes[0].distance / 1000;
+        } else {
+          throw new Error();
+        }
+      } catch (e) {
+        distKmIda = haversine(ORIGIN_COORDS, destCoords) * 1.3;
+      }
+
+      const distTotal = distKmIda * 2;
+      const litros = distTotal / KM_POR_LITRO;
+      const custoGasolina = litros * PRECO_LITRO;
+      const valorFinal = SERVICO_FIXO + custoGasolina;
+
+      // Preenche os dados na tela
+      document.getElementById("res-endereco").textContent = info.endereco;
+      document.getElementById("res-distancia").textContent = `${distTotal.toFixed(1)} km`;
+      document.getElementById("res-gasolina").textContent = `R$ ${custoGasolina.toFixed(2).replace('.', ',')}`;
+      document.getElementById("res-total").textContent = `R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
+
+      const msgWhats = `Olá! Gostaria de agendar o Paredão 011.\n\n📍 Destino: ${info.endereco} (CEP: ${cleanCep})\n🚗 Distância Ida/Volta: ${distTotal.toFixed(1)} km\n💰 Orçamento Calculado: R$ ${valorFinal.toFixed(2).replace('.', ',')}`;
+      document.getElementById("btn-whats").href = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(msgWhats)}`;
+
+      showStatus("", "");
+      document.getElementById("result").style.display = "block";
     }
   </script>
 </body>
