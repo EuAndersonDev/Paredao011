@@ -1,4 +1,6 @@
 const cepInput = document.getElementById("dest-cep");
+const venueInput = document.getElementById("event-venue");
+const eventAddressInput = document.getElementById("event-address");
 const startInput = document.getElementById("event-start");
 const startTimeInput = document.getElementById("event-start-time");
 const endInput = document.getElementById("event-end");
@@ -15,10 +17,6 @@ const currencyFormatter = new Intl.NumberFormat("pt-BR", {
 const hourFormatter = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 2
 });
-const distanceFormatter = new Intl.NumberFormat("pt-BR", {
-  minimumFractionDigits: 1,
-  maximumFractionDigits: 2
-});
 const saoPauloFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/Sao_Paulo",
   year: "numeric",
@@ -31,6 +29,9 @@ const saoPauloFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 let currentQuote = null;
+let requestInFlight = false;
+let cooldownInterval = null;
+let lastSuccessfulTrip = null;
 
 function maskTimeInput(event) {
   const input = event.currentTarget;
@@ -51,11 +52,39 @@ startTimeInput.addEventListener("input", maskTimeInput);
 endTimeInput.addEventListener("input", maskTimeInput);
 calculateButton.addEventListener("click", processarOrcamento);
 manualTollInput.addEventListener("input", atualizarTotalComPedagioManual);
+manualTollInput.addEventListener("change", enviarOrcamentoComPedagioManual);
 
 function showStatus(text, type) {
   const element = document.getElementById("status");
   element.className = `status-msg ${type}`;
   element.textContent = text;
+}
+
+function startRateLimitCooldown(response) {
+  const retryAfter = response.headers && response.headers.get("Retry-After");
+  const retrySeconds = typeof retryAfter === "string" && /^\d+$/.test(retryAfter.trim())
+    ? Number(retryAfter.trim())
+    : NaN;
+  const cooldownSeconds = Number.isSafeInteger(retrySeconds) && retrySeconds > 0
+    ? retrySeconds
+    : CONFIG.COOLDOWN_SECONDS;
+  const cooldownEndsAt = Date.now() + cooldownSeconds * 1000;
+  const message = "Muitas tentativas. Aguarde um instante e tente novamente.";
+
+  calculateButton.disabled = true;
+  showStatus(`${message} (${cooldownSeconds}s)`, "error");
+  cooldownInterval = setInterval(() => {
+    const remainingSeconds = Math.ceil((cooldownEndsAt - Date.now()) / 1000);
+    if (remainingSeconds <= 0) {
+      clearInterval(cooldownInterval);
+      cooldownInterval = null;
+      calculateButton.disabled = false;
+      showStatus("", "");
+      return;
+    }
+
+    showStatus(`${message} (${remainingSeconds}s)`, "error");
+  }, 1000);
 }
 
 function wallTimeToTimestamp(dateValue, timeValue, isEnd = false) {
@@ -157,11 +186,9 @@ function readManualToll() {
 function atualizarTotalComPedagioManual() {
   if (!currentQuote || currentQuote.tollsStatus !== "unknown") return;
 
-  const manualToll = readManualToll();
-  if (manualToll === null) {
-    document.getElementById("res-pedagios").textContent = "-";
+  const manualTollInputBRL = readManualToll();
+  if (manualTollInputBRL === null) {
     document.getElementById("res-total").textContent = "-";
-    document.getElementById("extra-hour-notice").hidden = true;
     document.getElementById("btn-whats").href = "#";
     manualTollStatus.className = "status-msg error";
     manualTollStatus.textContent = "Informe um valor válido de pedágios em reais para calcular o total.";
@@ -170,90 +197,167 @@ function atualizarTotalComPedagioManual() {
 
   manualTollStatus.className = "status-msg";
   manualTollStatus.textContent = "";
-  document.getElementById("res-pedagios").textContent = currencyFormatter.format(manualToll);
+  const manualToll = manualTollInputBRL * CONFIG.TOLL_VEHICLE_MULTIPLIER;
+  currentQuote.tollsBRL = manualToll;
+  currentQuote.tollsStatus = "manual";
   exibirTotal(currentQuote, manualToll);
+}
+
+async function enviarOrcamentoComPedagioManual() {
+  if (!currentQuote || currentQuote.tollsStatus !== "manual" || requestInFlight) return;
+  requestInFlight = true;
+  calculateButton.disabled = true;
+  try {
+    await enviarOrcamentoPorEmail(currentQuote);
+  } finally {
+    requestInFlight = false;
+    if (cooldownInterval === null) calculateButton.disabled = false;
+  }
+}
+
+async function enviarOrcamentoPorEmail(quote) {
+  if (quote.emailSent) return;
+
+  try {
+    showStatus("Enviando o orçamento por e-mail...", "loading");
+    const response = await fetch("/api/quote", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cep: quote.cep,
+        venueName: quote.venueName,
+        eventAddress: quote.eventAddress,
+        startDate: quote.start.date,
+        startTime: quote.start.time,
+        endDate: quote.end.date,
+        endTime: quote.end.time,
+        hours: quote.hours,
+        hourlyRateBRL: CONFIG.HOURLY_RATE_BRL,
+        laborBRL: quote.laborBRL,
+        outboundKm: quote.outboundKm,
+        returnKm: quote.returnKm,
+        fuelBRL: quote.fuelBRL,
+        tollsBRL: quote.tollsBRL,
+        tollsStatus: quote.tollsStatus
+      })
+    });
+
+    if (!response.ok) {
+      showStatus("Orçamento calculado, mas não foi possível enviar o e-mail. Tente novamente.", "error");
+      return;
+    }
+
+    quote.emailSent = true;
+    showStatus("Orçamento enviado por e-mail com sucesso.", "loading");
+  } catch {
+    showStatus("Orçamento calculado, mas não foi possível enviar o e-mail. Tente novamente.", "error");
+  }
 }
 
 function exibirTotal(quote, tollsBRL) {
   const total = quote.laborBRL + quote.fuelBRL + tollsBRL;
+  const depositBRL = total * CONFIG.RESERVATION_DEPOSIT_PERCENT / 100;
+  const balanceBRL = total - depositBRL;
   document.getElementById("res-total").textContent = currencyFormatter.format(total);
-  const extraHourNotice = document.getElementById("extra-hour-notice");
-  extraHourNotice.textContent =
-    `Qualquer horário adicional além do contratado será cobrado à parte: ${currencyFormatter.format(CONFIG.EXTRA_HOUR_RATE_BRL)} por hora adicional.`;
-  extraHourNotice.hidden = false;
 
   const message = [
-    "Olá! Gostaria de agendar o Paredão 011.",
+    "🔊 Paredão_011 – Orçamento",
     "",
-    `Destino: ${quote.address} (CEP: ${quote.cep})`,
-    `Início: ${formatDateForMessage(quote.start.date)} às ${quote.start.time}`,
-    `Fim: ${formatDateForMessage(quote.end.date)} às ${quote.end.time}`,
-    `Duração: ${hourFormatter.format(quote.hours)} horas`,
-    `Mão de obra: ${currencyFormatter.format(quote.laborBRL)}`,
-    `Distância ida e volta: ${distanceFormatter.format(quote.roundTripKm)} km`,
-    `Combustível: ${currencyFormatter.format(quote.fuelBRL)}`,
-    `Pedágios: ${currencyFormatter.format(tollsBRL)}`,
-    `Orçamento total: ${currencyFormatter.format(total)}`
+    `📍 Local: ${quote.venueName}`,
+    `📌 ${quote.eventAddress}`,
+    `📮 CEP: ${quote.cep}`,
+    `📅 Data: ${formatDateForMessage(quote.start.date)} a ${formatDateForMessage(quote.end.date)}`,
+    `⏰ Horário: ${quote.start.time} às ${quote.end.time} — ${hourFormatter.format(quote.hours)} horas`,
+    "",
+    `💰 Valor: ${currencyFormatter.format(total)}`,
+    "",
+    "Incluso:",
+    "• Estrutura de som profissional",
+    "• Montagem e desmontagem",
+    "• Deslocamento",
+    "• Acompanhamento durante o evento",
+    "",
+    `🔒 Reserva mediante sinal de ${CONFIG.RESERVATION_DEPOSIT_PERCENT}%: ${currencyFormatter.format(depositBRL)}`,
+    `💵 Saldo no dia: ${currencyFormatter.format(balanceBRL)}`,
+    "",
+    "🔥 Se quiser fechar, me confirma a data e já faço a reserva para você. Vamos garantir seu horário!"
   ].join("\n");
   document.getElementById("btn-whats").href =
     `https://wa.me/${CONFIG.WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+  quote.totalBRL = total;
 }
 
 async function processarOrcamento() {
+  if (requestInFlight || cooldownInterval !== null) return;
+
   const cleanCep = cepInput.value.replace(/\D/g, "");
+  const venueName = venueInput.value.trim();
+  const eventAddress = eventAddressInput.value.trim();
   const start = wallTimeToTimestamp(startInput.value, startTimeInput.value);
   const end = wallTimeToTimestamp(endInput.value, endTimeInput.value, true);
 
   if (start === null || end === null) {
     resultElement.style.display = "none";
-    document.getElementById("extra-hour-notice").hidden = true;
     showStatus("Use o formato 24h, ex.: 21:30, e informe datas e horários válidos.", "error");
     return;
   }
 
   if (end.timestamp <= start.timestamp) {
     resultElement.style.display = "none";
-    document.getElementById("extra-hour-notice").hidden = true;
     showStatus("O fim do evento deve ser posterior ao início.", "error");
     return;
   }
 
   if (cleanCep.length !== 8) {
     resultElement.style.display = "none";
-    document.getElementById("extra-hour-notice").hidden = true;
     showStatus("Digite um CEP válido com 8 dígitos.", "error");
     return;
   }
 
+  if (!venueName || !eventAddress) {
+    resultElement.style.display = "none";
+    showStatus("Informe o nome do local e o endereço completo do evento.", "error");
+    return;
+  }
+
   calculateButton.disabled = true;
+  requestInFlight = true;
   resultElement.style.display = "none";
-  document.getElementById("extra-hour-notice").hidden = true;
   manualTollGroup.hidden = true;
   currentQuote = null;
   showStatus("Consultando o CEP e calculando a rota...", "loading");
 
   try {
-    const response = await fetch("/api/trip", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cep: cleanCep })
-    });
-
     let data;
-    try {
-      data = await response.json();
-    } catch {
-      throw new Error("UPSTREAM_ERROR");
-    }
+    if (lastSuccessfulTrip && lastSuccessfulTrip.cep === cleanCep) {
+      data = lastSuccessfulTrip.data;
+    } else {
+      const response = await fetch("/api/trip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cep: cleanCep })
+      });
 
-    if (response.status === 404 && data.error === "CEP_NOT_FOUND") {
-      showStatus("CEP não encontrado. Confira os números digitados.", "error");
-      return;
-    }
+      if (response.status === 429) {
+        startRateLimitCooldown(response);
+        return;
+      }
 
-    if (!response.ok) {
-      showStatus("Não foi possível calcular a rota agora. Tente novamente mais tarde.", "error");
-      return;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error("UPSTREAM_ERROR");
+      }
+
+      if (response.status === 404 && data.error === "CEP_NOT_FOUND") {
+        showStatus("CEP não encontrado. Confira os números digitados.", "error");
+        return;
+      }
+
+      if (!response.ok) {
+        showStatus("Não foi possível calcular a rota agora. Tente novamente mais tarde.", "error");
+        return;
+      }
     }
 
     if (
@@ -271,6 +375,10 @@ async function processarOrcamento() {
       return;
     }
 
+    if (!lastSuccessfulTrip || lastSuccessfulTrip.cep !== cleanCep) {
+      lastSuccessfulTrip = { cep: cleanCep, data };
+    }
+
     const hours = (end.timestamp - start.timestamp) / 3600000;
     const laborBRL = hours * CONFIG.HOURLY_RATE_BRL;
     const roundTripKm = data.outboundKm + data.returnKm;
@@ -279,11 +387,13 @@ async function processarOrcamento() {
     const tollsBRL = data.tollsStatus === "unknown" ? null : data.tollsBRL;
 
     currentQuote = {
-      address: `CEP ${cleanCep}`,
+      venueName,
+      eventAddress,
       cep: cleanCep,
       hours,
       laborBRL,
-      roundTripKm,
+      outboundKm: data.outboundKm,
+      returnKm: data.returnKm,
       fuelBRL,
       tollsBRL,
       tollsStatus: data.tollsStatus,
@@ -291,32 +401,27 @@ async function processarOrcamento() {
       end
     };
 
-    document.getElementById("res-endereco").textContent = currentQuote.address || "-";
+    document.getElementById("res-endereco").textContent = cleanCep;
     document.getElementById("res-horas").textContent = `${hourFormatter.format(hours)} horas`;
-    document.getElementById("res-mao-de-obra").textContent = currencyFormatter.format(laborBRL);
-    document.getElementById("res-distancia").textContent =
-      `${distanceFormatter.format(roundTripKm)} km`;
-    document.getElementById("res-gasolina").textContent = currencyFormatter.format(fuelBRL);
     document.getElementById("res-total").textContent = "-";
     document.getElementById("btn-whats").href = "#";
+    resultElement.style.display = "block";
 
     if (data.tollsStatus === "unknown") {
-      document.getElementById("res-pedagios").textContent = "Informe o valor";
       manualTollInput.value = "";
       manualTollGroup.hidden = false;
       manualTollStatus.className = "status-msg error";
       manualTollStatus.textContent = "Informe o valor de pedágios em reais para calcular o total.";
     } else {
-      document.getElementById("res-pedagios").textContent =
-        currencyFormatter.format(tollsBRL);
       exibirTotal(currentQuote, tollsBRL);
+      await enviarOrcamentoPorEmail(currentQuote);
     }
-
-    showStatus("", "");
-    resultElement.style.display = "block";
+    if (data.tollsStatus === "unknown") showStatus("", "");
+    if (data.tollsStatus === "unknown") showStatus("", "");
   } catch {
     showStatus("Não foi possível conectar ao serviço de rotas. Tente novamente.", "error");
   } finally {
-    calculateButton.disabled = false;
+    requestInFlight = false;
+    if (cooldownInterval === null) calculateButton.disabled = false;
   }
 }

@@ -29,6 +29,16 @@
       </div>
 
       <div class="form-group">
+        <label for="event-venue">Nome do local do evento</label>
+        <input type="text" id="event-venue" autocomplete="organization" required>
+      </div>
+
+      <div class="form-group">
+        <label for="event-address">Endereço do evento</label>
+        <input type="text" id="event-address" autocomplete="street-address" required>
+      </div>
+
+      <div class="form-group">
         <label for="event-start">Data de início do evento</label>
         <input type="date" id="event-start" required>
         <label for="event-start-time">Horário de início (24 horas)</label>
@@ -61,26 +71,10 @@
             <span>Duração do evento</span>
             <strong id="res-horas">-</strong>
           </div>
-          <div class="result-item">
-            <span>Mão de obra</span>
-            <strong id="res-mao-de-obra">-</strong>
-          </div>
-          <div class="result-item">
-            <span>Percurso total (ida + volta)</span>
-            <strong id="res-distancia">-</strong>
-          </div>
-          <div class="result-item">
-            <span>Combustível</span>
-            <strong id="res-gasolina">-</strong>
-          </div>
-          <div class="result-item">
-            <span>Pedágios (ida + volta)</span>
-            <strong id="res-pedagios">-</strong>
-          </div>
         </div>
 
         <div id="manual-toll-group" class="form-group" hidden>
-          <label for="manual-toll">Pedágios (ida + volta) — informe o valor em reais</label>
+          <label for="manual-toll">Pedágio estimado para o carro (ida e volta); o cálculo inclui a carretinha</label>
           <input type="text" id="manual-toll" inputmode="decimal" placeholder="0,00" aria-describedby="manual-toll-status">
           <div id="manual-toll-status" class="status-msg"></div>
         </div>
@@ -89,8 +83,6 @@
           <div class="tag">Valor Estimado Total</div>
           <div class="price" id="res-total">-</div>
         </div>
-
-        <div id="extra-hour-notice" class="info-box" hidden></div>
 
         <a href="#" target="_blank" id="btn-whats" class="btn-whatsapp">
           Confirmar Orçamento no WhatsApp
