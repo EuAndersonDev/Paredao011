@@ -1,6 +1,8 @@
 const cepInput = document.getElementById("dest-cep");
 const startInput = document.getElementById("event-start");
+const startTimeInput = document.getElementById("event-start-time");
 const endInput = document.getElementById("event-end");
+const endTimeInput = document.getElementById("event-end-time");
 const calculateButton = document.getElementById("btn-calcular");
 const resultElement = document.getElementById("result");
 const manualTollGroup = document.getElementById("manual-toll-group");
@@ -30,12 +32,23 @@ const saoPauloFormatter = new Intl.DateTimeFormat("en-US", {
 
 let currentQuote = null;
 
+function maskTimeInput(event) {
+  const input = event.currentTarget;
+  const digits = input.value.replace(/\D/g, "").slice(0, 4);
+  input.value = digits.length > 2
+    ? `${digits.slice(0, 2)}:${digits.slice(2)}`
+    : digits.length === 2 ? `${digits}:` : digits;
+  input.setSelectionRange(input.value.length, input.value.length);
+}
+
 cepInput.addEventListener("input", (event) => {
   let value = event.target.value.replace(/\D/g, "").slice(0, 8);
   if (value.length > 5) value = `${value.slice(0, 5)}-${value.slice(5)}`;
   event.target.value = value;
 });
 
+startTimeInput.addEventListener("input", maskTimeInput);
+endTimeInput.addEventListener("input", maskTimeInput);
 calculateButton.addEventListener("click", processarOrcamento);
 manualTollInput.addEventListener("input", atualizarTotalComPedagioManual);
 
@@ -45,21 +58,62 @@ function showStatus(text, type) {
   element.textContent = text;
 }
 
-function wallTimeToTimestamp(value) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value);
-  if (!match) return null;
+function wallTimeToTimestamp(dateValue, timeValue, isEnd = false) {
+  const dateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateValue);
+  const timeMatch = /^(\d{2}):(\d{2})$/.exec(timeValue);
+  if (!dateMatch || !timeMatch) return null;
 
-  const [, yearText, monthText, dayText, hourText, minuteText] = match;
-  const parts = [yearText, monthText, dayText, hourText, minuteText].map(Number);
-  const [year, month, day, hour, minute] = parts;
-  const localAsUtc = Date.UTC(year, month - 1, day, hour, minute);
+  const [, yearText, monthText, dayText] = dateMatch;
+  const [, hourText, minuteText] = timeMatch;
+  const [year, month, day, hour, minute] =
+    [yearText, monthText, dayText, hourText, minuteText].map(Number);
+  const isEndOfDay = isEnd && hour === 24 && minute === 0;
+  if ((hour > 23 && !isEndOfDay) || minute > 59) return null;
+
+  let normalizedDate = dateValue;
+  let normalizedTime = timeValue;
+  let normalizedYear = year;
+  let normalizedMonth = month;
+  let normalizedDay = day;
+  let normalizedHour = hour;
+
+  if (isEndOfDay) {
+    const nextDay = new Date(Date.UTC(year, month - 1, day + 1));
+    normalizedDate = [
+      String(nextDay.getUTCFullYear()).padStart(4, "0"),
+      String(nextDay.getUTCMonth() + 1).padStart(2, "0"),
+      String(nextDay.getUTCDate()).padStart(2, "0")
+    ].join("-");
+    normalizedTime = "00:00";
+    normalizedYear = nextDay.getUTCFullYear();
+    normalizedMonth = nextDay.getUTCMonth() + 1;
+    normalizedDay = nextDay.getUTCDate();
+    normalizedHour = 0;
+  }
+
+  const originalDateCheck = new Date(Date.UTC(year, month - 1, day));
+  if (
+    originalDateCheck.getUTCFullYear() !== year ||
+    originalDateCheck.getUTCMonth() !== month - 1 ||
+    originalDateCheck.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  const localAsUtc = Date.UTC(
+    normalizedYear,
+    normalizedMonth - 1,
+    normalizedDay,
+    normalizedHour,
+    minute
+  );
   const validationDate = new Date(localAsUtc);
 
   if (
-    validationDate.getUTCFullYear() !== year ||
-    validationDate.getUTCMonth() !== month - 1 ||
-    validationDate.getUTCDate() !== day ||
-    validationDate.getUTCHours() !== hour ||
+    validationDate.getUTCFullYear() !== normalizedYear ||
+    validationDate.getUTCMonth() !== normalizedMonth - 1 ||
+    validationDate.getUTCDate() !== normalizedDay ||
+    validationDate.getUTCHours() !== normalizedHour ||
     validationDate.getUTCMinutes() !== minute
   ) {
     return null;
@@ -85,7 +139,12 @@ function wallTimeToTimestamp(value) {
     if (adjustment === 0) break;
   }
 
-  return timestamp;
+  return { timestamp, date: normalizedDate, time: normalizedTime };
+}
+
+function formatDateForMessage(dateValue) {
+  const [year, month, day] = dateValue.split("-");
+  return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year.padStart(4, "0")}`;
 }
 
 function readManualToll() {
@@ -102,6 +161,7 @@ function atualizarTotalComPedagioManual() {
   if (manualToll === null) {
     document.getElementById("res-pedagios").textContent = "-";
     document.getElementById("res-total").textContent = "-";
+    document.getElementById("extra-hour-notice").hidden = true;
     document.getElementById("btn-whats").href = "#";
     manualTollStatus.className = "status-msg error";
     manualTollStatus.textContent = "Informe um valor válido de pedágios em reais para calcular o total.";
@@ -117,11 +177,17 @@ function atualizarTotalComPedagioManual() {
 function exibirTotal(quote, tollsBRL) {
   const total = quote.laborBRL + quote.fuelBRL + tollsBRL;
   document.getElementById("res-total").textContent = currencyFormatter.format(total);
+  const extraHourNotice = document.getElementById("extra-hour-notice");
+  extraHourNotice.textContent =
+    `Qualquer horário adicional além do contratado será cobrado à parte: ${currencyFormatter.format(CONFIG.EXTRA_HOUR_RATE_BRL)} por hora adicional.`;
+  extraHourNotice.hidden = false;
 
   const message = [
     "Olá! Gostaria de agendar o Paredão 011.",
     "",
     `Destino: ${quote.address} (CEP: ${quote.cep})`,
+    `Início: ${formatDateForMessage(quote.start.date)} às ${quote.start.time}`,
+    `Fim: ${formatDateForMessage(quote.end.date)} às ${quote.end.time}`,
     `Duração: ${hourFormatter.format(quote.hours)} horas`,
     `Mão de obra: ${currencyFormatter.format(quote.laborBRL)}`,
     `Distância ida e volta: ${distanceFormatter.format(quote.roundTripKm)} km`,
@@ -135,29 +201,33 @@ function exibirTotal(quote, tollsBRL) {
 
 async function processarOrcamento() {
   const cleanCep = cepInput.value.replace(/\D/g, "");
-  const start = wallTimeToTimestamp(startInput.value);
-  const end = wallTimeToTimestamp(endInput.value);
+  const start = wallTimeToTimestamp(startInput.value, startTimeInput.value);
+  const end = wallTimeToTimestamp(endInput.value, endTimeInput.value, true);
 
   if (start === null || end === null) {
     resultElement.style.display = "none";
-    showStatus("Informe a data e o horário válidos de início e fim do evento.", "error");
+    document.getElementById("extra-hour-notice").hidden = true;
+    showStatus("Use o formato 24h, ex.: 21:30, e informe datas e horários válidos.", "error");
     return;
   }
 
-  if (end <= start) {
+  if (end.timestamp <= start.timestamp) {
     resultElement.style.display = "none";
+    document.getElementById("extra-hour-notice").hidden = true;
     showStatus("O fim do evento deve ser posterior ao início.", "error");
     return;
   }
 
   if (cleanCep.length !== 8) {
     resultElement.style.display = "none";
+    document.getElementById("extra-hour-notice").hidden = true;
     showStatus("Digite um CEP válido com 8 dígitos.", "error");
     return;
   }
 
   calculateButton.disabled = true;
   resultElement.style.display = "none";
+  document.getElementById("extra-hour-notice").hidden = true;
   manualTollGroup.hidden = true;
   currentQuote = null;
   showStatus("Consultando o CEP e calculando a rota...", "loading");
@@ -201,7 +271,7 @@ async function processarOrcamento() {
       return;
     }
 
-    const hours = (end - start) / 3600000;
+    const hours = (end.timestamp - start.timestamp) / 3600000;
     const laborBRL = hours * CONFIG.HOURLY_RATE_BRL;
     const roundTripKm = data.outboundKm + data.returnKm;
     const fuelBRL = (roundTripKm / CONFIG.CAR_KM_PER_LITER) *
@@ -216,7 +286,9 @@ async function processarOrcamento() {
       roundTripKm,
       fuelBRL,
       tollsBRL,
-      tollsStatus: data.tollsStatus
+      tollsStatus: data.tollsStatus,
+      start,
+      end
     };
 
     document.getElementById("res-endereco").textContent = currentQuote.address || "-";

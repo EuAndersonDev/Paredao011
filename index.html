@@ -29,13 +29,17 @@
       </div>
 
       <div class="form-group">
-        <label for="event-start">Início do evento</label>
-        <input type="datetime-local" id="event-start" required>
+        <label for="event-start">Data de início do evento</label>
+        <input type="date" id="event-start" required>
+        <label for="event-start-time">Horário de início (24 horas)</label>
+        <input type="text" id="event-start-time" inputmode="numeric" maxlength="5" placeholder="HH:mm" autocomplete="off" required>
       </div>
 
       <div class="form-group">
-        <label for="event-end">Fim do evento</label>
-        <input type="datetime-local" id="event-end" required>
+        <label for="event-end">Data de fim do evento</label>
+        <input type="date" id="event-end" required>
+        <label for="event-end-time">Horário de fim (24 horas)</label>
+        <input type="text" id="event-end-time" inputmode="numeric" maxlength="5" placeholder="HH:mm" autocomplete="off" required>
       </div>
 
       <div class="form-group">
@@ -85,6 +89,8 @@
           <div class="tag">Valor Estimado Total</div>
           <div class="price" id="res-total">-</div>
         </div>
+
+        <div id="extra-hour-notice" class="info-box" hidden></div>
 
         <a href="#" target="_blank" id="btn-whats" class="btn-whatsapp">
           Confirmar Orçamento no WhatsApp
