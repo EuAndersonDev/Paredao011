@@ -1,0 +1,239 @@
+:root {
+  --bg: #090a0f;
+  --card-bg: #12141c;
+  --card-border: #1f2333;
+  --accent: #ff4d00;
+  --accent-glow: rgba(255, 77, 0, 0.35);
+  --green: #10b981;
+  --text: #f3f4f6;
+  --text-muted: #9ca3af;
+  --font-main: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-main);
+  line-height: 1.5;
+  padding-bottom: 50px;
+}
+
+header {
+  padding: 2.5rem 1.5rem 1.5rem;
+  text-align: center;
+  background: radial-gradient(circle at 50% 0%, #20130f, transparent 70%);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(255, 77, 0, 0.15);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 0.8rem;
+}
+
+h1 span {
+  color: var(--accent);
+  text-shadow: 0 0 20px var(--accent-glow);
+}
+
+header p {
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: 1rem;
+}
+
+main {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 1rem;
+  padding: 1.75rem;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+}
+
+.card h2 {
+  font-size: 1.35rem;
+  margin-bottom: 0.3rem;
+}
+
+.card .subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.info-box {
+  background: #181b26;
+  border-left: 4px solid var(--accent);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #e5e7eb;
+}
+
+.input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+input {
+  width: 100%;
+  background: #090a0f;
+  border: 1px solid var(--card-border);
+  color: #fff;
+  padding: 0.85rem 1rem;
+  border-radius: 0.6rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+}
+
+input:focus {
+  border-color: var(--accent);
+}
+
+button.btn-calc {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  padding: 0 1.5rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.2s;
+}
+
+button.btn-calc:hover {
+  filter: brightness(1.15);
+}
+
+button.btn-calc:disabled {
+  cursor: wait;
+  filter: brightness(0.7);
+}
+
+.status-msg {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  display: none;
+}
+.status-msg.error { color: #ef4444; display: block; }
+.status-msg.loading { color: var(--accent); display: block; }
+
+.result-box {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--card-border);
+  display: none;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 520px) {
+  .result-grid { grid-template-columns: 1fr; }
+}
+
+.result-item {
+  background: #090a0f;
+  padding: 0.85rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--card-border);
+}
+
+.result-item span {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.result-item strong {
+  font-size: 1.05rem;
+  color: #fff;
+}
+
+.total-banner {
+  background: linear-gradient(135deg, rgba(255, 77, 0, 0.15), rgba(16, 185, 129, 0.05));
+  border: 1px solid var(--accent);
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.total-banner .tag {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.total-banner .price {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.btn-whatsapp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: var(--green);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 1rem;
+  border-radius: 0.6rem;
+  font-size: 1rem;
+  transition: filter 0.2s;
+}
+
+.btn-whatsapp:hover {
+  filter: brightness(1.1);
+}

@@ -1,0 +1,166 @@
+const CONFIG = require("../config");
+
+let originAddressCache = null;
+
+function sendError(response, status, code) {
+  return response.status(status).json({ error: code });
+}
+
+async function buscarEndereco(cep, signal) {
+  const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`, { signal });
+  if (!response.ok) throw new Error("UPSTREAM_ERROR");
+
+  const data = await response.json();
+  if (data.erro === true || data.erro === "true") return null;
+
+  const addressParts = [
+    data.logradouro,
+    data.bairro,
+    data.localidade && data.uf ? `${data.localidade} - ${data.uf}` : data.localidade || data.uf,
+    cep,
+    "Brasil"
+  ].filter(Boolean);
+
+  return addressParts.join(", ");
+}
+
+async function getOriginAddress(signal) {
+  if (originAddressCache) return originAddressCache;
+  const address = await buscarEndereco(CONFIG.ORIGIN_CEP, signal);
+  if (!address) throw new Error("UPSTREAM_ERROR");
+  originAddressCache = address;
+  return address;
+}
+
+function construirBodyRoute(origin, destination) {
+  return {
+    origin: { address: origin },
+    destination: { address: destination },
+    travelMode: "DRIVE",
+    routeModifiers: {
+      vehicleInfo: { emissionType: "GASOLINE" }
+    },
+    extraComputations: ["TOLLS"],
+    regionCode: "BR",
+    languageCode: "pt-BR"
+  };
+}
+
+async function buscarRota(origin, destination, apiKey, signal) {
+  const response = await fetch(
+    "https://routes.googleapis.com/directions/v2:computeRoutes",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+        "X-Goog-FieldMask": "routes.distanceMeters,routes.travelAdvisory.tollInfo"
+      },
+      body: JSON.stringify(construirBodyRoute(origin, destination)),
+      signal
+    }
+  );
+  if (!response.ok) throw new Error("UPSTREAM_ERROR");
+
+  const data = await response.json();
+  const route = Array.isArray(data.routes) ? data.routes[0] : null;
+  if (
+    !route ||
+    typeof route.distanceMeters !== "number" ||
+    !Number.isFinite(route.distanceMeters) ||
+    route.distanceMeters < 0
+  ) {
+    throw new Error("UPSTREAM_ERROR");
+  }
+
+  return {
+    distanceKm: route.distanceMeters / 1000,
+    tollInfo: route.travelAdvisory && route.travelAdvisory.tollInfo
+  };
+}
+
+function totalizarPedagios(outbound, returning) {
+  if (!outbound.tollInfo && !returning.tollInfo) {
+    return { tollsBRL: 0, tollsStatus: "none" };
+  }
+
+  const tollInfos = [outbound.tollInfo, returning.tollInfo];
+  if (tollInfos.some((tollInfo) =>
+    !tollInfo ||
+    !Array.isArray(tollInfo.estimatedPrice) ||
+    tollInfo.estimatedPrice.length === 0
+  )) {
+    return { tollsBRL: null, tollsStatus: "unknown" };
+  }
+
+  let total = 0;
+  for (const tollInfo of tollInfos) {
+    for (const price of tollInfo.estimatedPrice) {
+      if (price.currencyCode !== "BRL") {
+        return { tollsBRL: null, tollsStatus: "unknown" };
+      }
+
+      const units = Number(price.units);
+      const nanos = Number(price.nanos || 0);
+      if (!Number.isFinite(units) || !Number.isFinite(nanos)) {
+        return { tollsBRL: null, tollsStatus: "unknown" };
+      }
+
+      total += units + nanos / 1_000_000_000;
+    }
+  }
+
+  return { tollsBRL: total, tollsStatus: "priced" };
+}
+
+module.exports = async function handler(request, response) {
+  if (request.method !== "POST") {
+    response.setHeader("Allow", "POST");
+    return sendError(response, 405, "METHOD_NOT_ALLOWED");
+  }
+
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (!apiKey) {
+    return sendError(response, 500, "SERVICE_UNAVAILABLE");
+  }
+
+  const body = typeof request.body === "string"
+    ? (() => {
+      try {
+        return JSON.parse(request.body);
+      } catch {
+        return null;
+      }
+    })()
+    : request.body;
+  const cep = body && typeof body.cep === "string" ? body.cep.replace(/\D/g, "") : "";
+  if (!/^\d{8}$/.test(cep)) {
+    return sendError(response, 400, "INVALID_CEP");
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+
+  try {
+    const destinationAddress = await buscarEndereco(cep, controller.signal);
+    if (!destinationAddress) return sendError(response, 404, "CEP_NOT_FOUND");
+
+    const originAddress = await getOriginAddress(controller.signal);
+    const [outbound, returning] = await Promise.all([
+      buscarRota(originAddress, destinationAddress, apiKey, controller.signal),
+      buscarRota(destinationAddress, originAddress, apiKey, controller.signal)
+    ]);
+
+    const tolls = totalizarPedagios(outbound, returning);
+    return response.status(200).json({
+      outboundKm: outbound.distanceKm,
+      returnKm: returning.distanceKm,
+      tollsBRL: tolls.tollsBRL,
+      tollsStatus: tolls.tollsStatus
+    });
+  } catch {
+    return sendError(response, 502, "UPSTREAM_ERROR");
+  } finally {
+    clearTimeout(timeout);
+  }
+};
