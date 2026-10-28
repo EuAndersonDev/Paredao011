@@ -1,12 +1,11 @@
 :root {
   --bg: #090a0f;
-  --card-bg: #12141c;
-  --card-border: #1f2333;
-  --accent: #ff4d00;
-  --accent-glow: rgba(255, 77, 0, 0.35);
-  --green: #10b981;
-  --text: #f3f4f6;
-  --text-muted: #9ca3af;
+  --card-bg: rgba(12, 13, 16, 0.94);
+  --card-border: rgba(255, 214, 0, 0.42);
+  --accent: #ffd600;
+  --accent-glow: rgba(255, 214, 0, 0.42);
+  --text: #ffffff;
+  --text-muted: #d1d1d1;
   --font-main: 'Plus Jakarta Sans', sans-serif;
   --font-display: 'Space Grotesk', sans-serif;
 }
@@ -14,7 +13,10 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background-color: var(--bg);
+  background:
+    linear-gradient(rgba(5, 6, 8, 0.64), rgba(5, 6, 8, 0.78)),
+    url("background.jpg") center center / cover fixed,
+    var(--bg);
   color: var(--text);
   font-family: var(--font-main);
   line-height: 1.5;
@@ -24,7 +26,7 @@ body {
 header {
   padding: 2.5rem 1.5rem 1.5rem;
   text-align: center;
-  background: radial-gradient(circle at 50% 0%, #20130f, transparent 70%);
+  background: linear-gradient(rgba(8, 9, 11, 0.86), rgba(8, 9, 11, 0.56));
   border-bottom: 1px solid var(--card-border);
 }
 
@@ -36,7 +38,7 @@ header {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background: rgba(255, 77, 0, 0.15);
+  background: rgba(255, 214, 0, 0.14);
   color: var(--accent);
   border: 1px solid var(--accent);
   margin-bottom: 1rem;
@@ -73,7 +75,8 @@ main {
   border: 1px solid var(--card-border);
   border-radius: 1rem;
   padding: 1.75rem;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.58);
+  backdrop-filter: blur(8px);
 }
 
 .card h2 {
@@ -88,7 +91,7 @@ main {
 }
 
 .info-box {
-  background: #181b26;
+  background: rgba(255, 255, 255, 0.07);
   border-left: 4px solid var(--accent);
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
@@ -106,7 +109,7 @@ label {
   font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 0.4rem;
-  color: #e5e7eb;
+  color: #ffffff;
 }
 
 .input-row {
@@ -116,7 +119,7 @@ label {
 
 input {
   width: 100%;
-  background: #090a0f;
+  background: rgba(5, 6, 8, 0.88);
   border: 1px solid var(--card-border);
   color: #fff;
   padding: 0.85rem 1rem;
@@ -124,6 +127,7 @@ input {
   font-size: 1rem;
   outline: none;
   transition: border 0.2s;
+  color-scheme: dark;
 }
 
 input:focus {
@@ -132,7 +136,7 @@ input:focus {
 
 button.btn-calc {
   background: var(--accent);
-  color: #fff;
+  color: #111111;
   font-weight: 700;
   border: none;
   padding: 0 1.5rem;
@@ -156,7 +160,7 @@ button.btn-calc:disabled {
   margin-top: 0.5rem;
   display: none;
 }
-.status-msg.error { color: #ef4444; display: block; }
+.status-msg.error { color: #ff8585; display: block; }
 .status-msg.loading { color: var(--accent); display: block; }
 
 .result-box {
@@ -178,7 +182,7 @@ button.btn-calc:disabled {
 }
 
 .result-item {
-  background: #090a0f;
+  background: rgba(5, 6, 8, 0.82);
   padding: 0.85rem;
   border-radius: 0.5rem;
   border: 1px solid var(--card-border);
@@ -192,11 +196,11 @@ button.btn-calc:disabled {
 
 .result-item strong {
   font-size: 1.05rem;
-  color: #fff;
+  color: #ffffff;
 }
 
 .total-banner {
-  background: linear-gradient(135deg, rgba(255, 77, 0, 0.15), rgba(16, 185, 129, 0.05));
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.18), rgba(255, 255, 255, 0.04));
   border: 1px solid var(--accent);
   padding: 1.25rem;
   border-radius: 0.75rem;
@@ -216,7 +220,7 @@ button.btn-calc:disabled {
   font-family: var(--font-display);
   font-size: 2.2rem;
   font-weight: 700;
-  color: #fff;
+  color: #ffffff;
 }
 
 .btn-whatsapp {
@@ -224,8 +228,8 @@ button.btn-calc:disabled {
   align-items: center;
   justify-content: center;
   width: 100%;
-  background: var(--green);
-  color: #fff;
+  background: var(--accent);
+  color: #111111;
   text-decoration: none;
   font-weight: 700;
   padding: 1rem;

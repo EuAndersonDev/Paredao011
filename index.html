@@ -1,95 +1,98 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paredão 011 | Estrutura de Som & Orçamento Online</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <script src="config.js" defer></script>
-  <script src="app.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paredão 011 | Estrutura de Som & Orçamento Online</title>
+    <link rel="icon" type="image/jpeg" href="/paredao.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="config.js" defer></script>
+    <script src="app.js" defer></script>
 </head>
+
 <body>
 
-  <header>
-    <div class="badge">Graves Pesados • 011 SP</div>
-    <h1>PAREDÃO <span>011</span></h1>
-    <p>Locação de estrutura completa de som automotivo para festas e eventos na Grande SP.</p>
-  </header>
+    <header>
+        <div class="badge">orçamentos</div>
+        <h1>@PAREDÃO_<span>011</span></h1>
+        <p>Locação de estrutura completa de som automotivo para festas e eventos na Grande SP.</p>
+    </header>
 
-  <main>
-    <div class="card">
-      <h2>Simulador de Frete e Locação</h2>
-      <p class="subtitle">Base de saída: Itaquera • Cálculo de mão de obra, combustível e pedágios.</p>
+    <main>
+        <div class="card">
+            <h2>Simulador de orçamento</h2>
+            <br>
+            <div class="info-box">
+                O orçamento considera a duração do evento, o percurso de ida e volta e os pedágios.
+            </div>
 
-      <div class="info-box">
-        O orçamento considera a duração do evento, o percurso de ida e volta e os pedágios.
-      </div>
+            <div class="form-group">
+                <label for="event-venue">Nome do responsavel</label>
+                <input type="text" id="event-venue" autocomplete="organization" required>
+            </div>
 
-      <div class="form-group">
-        <label for="event-venue">Nome do local do evento</label>
-        <input type="text" id="event-venue" autocomplete="organization" required>
-      </div>
+            <div class="form-group">
+                <label for="event-address">Endereço do evento</label>
+                <input type="text" id="event-address" autocomplete="street-address" required>
+            </div>
 
-      <div class="form-group">
-        <label for="event-address">Endereço do evento</label>
-        <input type="text" id="event-address" autocomplete="street-address" required>
-      </div>
+            <div class="form-group">
+                <label for="event-start">Data de início do evento</label>
+                <input type="date" id="event-start" required>
+                <label for="event-start-time">Horário de início (24 horas)</label>
+                <input type="text" id="event-start-time" inputmode="numeric" maxlength="5" placeholder="HH:mm" autocomplete="off" required>
+            </div>
 
-      <div class="form-group">
-        <label for="event-start">Data de início do evento</label>
-        <input type="date" id="event-start" required>
-        <label for="event-start-time">Horário de início (24 horas)</label>
-        <input type="text" id="event-start-time" inputmode="numeric" maxlength="5" placeholder="HH:mm" autocomplete="off" required>
-      </div>
+            <div class="form-group">
+                <label for="event-end">Data de fim do evento</label>
+                <input type="date" id="event-end" required>
+                <label for="event-end-time">Horário de fim (24 horas)</label>
+                <input type="text" id="event-end-time" inputmode="numeric" maxlength="5" placeholder="HH:mm" autocomplete="off" required>
+            </div>
 
-      <div class="form-group">
-        <label for="event-end">Data de fim do evento</label>
-        <input type="date" id="event-end" required>
-        <label for="event-end-time">Horário de fim (24 horas)</label>
-        <input type="text" id="event-end-time" inputmode="numeric" maxlength="5" placeholder="HH:mm" autocomplete="off" required>
-      </div>
+            <div class="form-group">
+                <label for="dest-cep">CEP do Local do Evento</label>
+                <div class="input-row">
+                    <input type="text" id="dest-cep" placeholder="00000-000" maxlength="9" inputmode="numeric">
+                    <button class="btn-calc" id="btn-calcular" type="button">Calcular</button>
+                </div>
+                <div id="status" class="status-msg"></div>
+            </div>
 
-      <div class="form-group">
-        <label for="dest-cep">CEP do Local do Evento</label>
-        <div class="input-row">
-          <input type="text" id="dest-cep" placeholder="00000-000" maxlength="9" inputmode="numeric">
-          <button class="btn-calc" id="btn-calcular" type="button">Calcular</button>
-        </div>
-        <div id="status" class="status-msg"></div>
-      </div>
+            <div id="result" class="result-box">
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span>CEP consultado</span>
+                        <strong id="res-endereco">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>Duração do evento</span>
+                        <strong id="res-horas">-</strong>
+                    </div>
+                </div>
 
-      <div id="result" class="result-box">
-        <div class="result-grid">
-          <div class="result-item">
-            <span>CEP consultado</span>
-            <strong id="res-endereco">-</strong>
-          </div>
-          <div class="result-item">
-            <span>Duração do evento</span>
-            <strong id="res-horas">-</strong>
-          </div>
-        </div>
+                <div id="manual-toll-group" class="form-group" hidden>
+                    <label for="manual-toll">Pedágio estimado para o carro (ida e volta); o cálculo inclui a carretinha</label>
+                    <input type="text" id="manual-toll" inputmode="decimal" placeholder="0,00" aria-describedby="manual-toll-status">
+                    <div id="manual-toll-status" class="status-msg"></div>
+                </div>
 
-        <div id="manual-toll-group" class="form-group" hidden>
-          <label for="manual-toll">Pedágio estimado para o carro (ida e volta); o cálculo inclui a carretinha</label>
-          <input type="text" id="manual-toll" inputmode="decimal" placeholder="0,00" aria-describedby="manual-toll-status">
-          <div id="manual-toll-status" class="status-msg"></div>
-        </div>
+                <div class="total-banner">
+                    <div class="tag">Valor Estimado Total</div>
+                    <div class="price" id="res-total">-</div>
+                </div>
 
-        <div class="total-banner">
-          <div class="tag">Valor Estimado Total</div>
-          <div class="price" id="res-total">-</div>
-        </div>
-
-        <a href="#" target="_blank" id="btn-whats" class="btn-whatsapp">
+                <a href="#" target="_blank" id="btn-whats" class="btn-whatsapp">
           Confirmar Orçamento no WhatsApp
         </a>
-      </div>
-    </div>
-  </main>
+            </div>
+        </div>
+    </main>
 
 </body>
+
 </html>
