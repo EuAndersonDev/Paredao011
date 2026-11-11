@@ -4,95 +4,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paredão 011 | Estrutura de Som & Orçamento Online</title>
+    <title>Paredão 011 | Locação de Paredão de Som para Festas e Eventos na Grande SP</title>
+    <meta name="description" content="Locação de estrutura completa de som automotivo (paredão) para festas e eventos na Grande São Paulo. Montagem, desmontagem e acompanhamento. Simule seu orçamento online.">
+    <link rel="canonical" href="https://paredao011.vercel.app/">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="Paredão 011">
+    <meta property="og:title" content="Paredão 011 | Paredão de som para festas na Grande SP">
+    <meta property="og:description" content="Estrutura completa de som automotivo para sua festa ou evento na Grande São Paulo. Simule o orçamento e confirme pelo WhatsApp.">
+    <meta property="og:url" content="https://paredao011.vercel.app/">
+    <meta property="og:image" content="https://paredao011.vercel.app/background.jpg">
+    <meta name="theme-color" content="#090a0f">
     <link rel="icon" type="image/jpeg" href="/paredao.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <script src="config.js" defer></script>
-    <script src="app.js" defer></script>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/site.css">
+    <script src="/config.js" defer></script>
+    <script src="/site.js" defer></script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "Paredão 011",
+        "description": "Locação de estrutura completa de som automotivo para festas e eventos na Grande São Paulo.",
+        "url": "https://paredao011.vercel.app/",
+        "image": "https://paredao011.vercel.app/paredao.jpg",
+        "logo": "https://paredao011.vercel.app/paredao.jpg",
+        "telephone": "+55-11-98356-9830",
+        "areaServed": {
+            "@type": "AdministrativeArea",
+            "name": "Grande São Paulo"
+        },
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "{{ADDRESS_LOCALITY}}",
+            "addressRegion": "SP",
+            "addressCountry": "BR"
+        },
+        "openingHours": "{{OPENING_HOURS}}",
+        "sameAs": ["https://www.instagram.com/paredao_011/"]
+    }
+    </script>
 </head>
 
-<body>
-
-    <header>
-        <div class="badge">orçamentos</div>
-        <h1>@PAREDÃO_<span>011</span></h1>
-        <p>Locação de estrutura completa de som automotivo para festas e eventos na Grande SP.</p>
+<body class="landing">
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a class="brand" href="/" aria-label="Paredão 011 – página inicial">
+                <img src="/paredao.jpg" alt="" width="36" height="36">
+                <span>PAREDÃO_<b>011</b></span>
+            </a>
+            <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-principal">
+                <span class="menu-toggle__bars" aria-hidden="true"></span>
+            </button>
+            <nav class="site-nav" id="menu-principal" aria-label="Menu principal">
+                <ul>
+                    <li><a href="/" aria-current="page">Início</a></li>
+                    <li><a href="/#servicos">Serviços</a></li>
+                    <li><a href="/#como-funciona">Como funciona</a></li>
+                    <li><a class="nav-cta" href="/orcamento">Simular orçamento</a></li>
+                    <li><a href="https://wa.me/5511983569830" data-whatsapp target="_blank" rel="noopener">WhatsApp</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
 
-    <main>
-        <div class="card">
-            <h2>Simulador de orçamento</h2>
-            <br>
-            <div class="info-box">
-                O orçamento considera a duração do evento, o percurso de ida e volta e os pedágios.
-            </div>
-
-            <div class="form-group">
-                <label for="event-venue">Nome do responsável</label>
-                <input type="text" id="event-venue" autocomplete="organization" required>
-            </div>
-
-            <div class="form-group">
-                <label for="event-address">Endereço do evento</label>
-                <input type="text" id="event-address" autocomplete="street-address" required>
-            </div>
-
-            <div class="form-group">
-                <label for="event-start">Data de início do evento</label>
-                <input type="date" id="event-start" required>
-                <label for="event-start-time">Horário de início (24 horas)</label>
-                <input type="text" id="event-start-time" inputmode="numeric" maxlength="5" placeholder="HH:mm" autocomplete="off" required>
-            </div>
-
-            <div class="form-group">
-                <label for="event-end">Data de fim do evento</label>
-                <input type="date" id="event-end" required>
-                <label for="event-end-time">Horário de fim (24 horas)</label>
-                <input type="text" id="event-end-time" inputmode="numeric" maxlength="5" placeholder="HH:mm" autocomplete="off" required>
-            </div>
-
-            <div class="form-group">
-                <label for="dest-cep">CEP do Local do Evento</label>
-                <div class="input-row">
-                    <input type="text" id="dest-cep" placeholder="00000-000" maxlength="9" inputmode="numeric">
-                    <button class="btn-calc" id="btn-calcular" type="button">Calcular</button>
+    <main id="conteudo">
+        <!-- 1. Hero -->
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="container">
+                <div class="badge">@PAREDÃO_011 · Grande SP</div>
+                <h1 id="hero-title">Paredão de som pra sua festa <span>tremer</span></h1>
+                <p>Locação de estrutura completa de som automotivo para festas e eventos na Grande São Paulo. A gente leva, monta, acompanha e desmonta.</p>
+                <div class="btn-row">
+                    <a class="btn btn--primary" href="/orcamento">Simular orçamento</a>
+                    <a class="btn btn--ghost" href="https://wa.me/5511983569830" data-whatsapp target="_blank" rel="noopener">Falar no WhatsApp</a>
                 </div>
-                <div id="status" class="status-msg"></div>
+                <p class="hero-note">Valor estimado na hora, com base na duração do evento, deslocamento e pedágios.</p>
+                <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
             </div>
+        </section>
 
-            <div id="result" class="result-box">
-                <div class="result-grid">
-                    <div class="result-item">
-                        <span>CEP consultado</span>
-                        <strong id="res-endereco">-</strong>
-                    </div>
-                    <div class="result-item">
-                        <span>Duração do evento</span>
-                        <strong id="res-horas">-</strong>
-                    </div>
+        <!-- 2. Serviços -->
+        <section class="section section--alt" id="servicos" aria-labelledby="servicos-title">
+            <div class="container">
+                <span class="eyebrow">Serviços</span>
+                <h2 id="servicos-title">Tudo incluso no orçamento</h2>
+                <p class="section-lead">Você cuida da festa. A estrutura de som chega pronta pra funcionar.</p>
+                <!-- {{SERVICE_LIST}}: adicionar outros serviços/equipamentos oferecidos (ex.: modelos de paredão, iluminação) com título, descrição e imagem opcional. -->
+                <div class="grid grid--4">
+                    <article class="service-card">
+                        <div class="service-card__icon" aria-hidden="true">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="14" r="4"/><circle cx="12" cy="6" r="1.5"/></svg>
+                        </div>
+                        <h3>Estrutura de som profissional</h3>
+                        <p>Estrutura completa de som automotivo para festas e eventos.</p>
+                    </article>
+                    <article class="service-card">
+                        <div class="service-card__icon" aria-hidden="true">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>
+                        </div>
+                        <h3>Montagem e desmontagem</h3>
+                        <p>Montamos tudo no local do evento e desmontamos ao final.</p>
+                    </article>
+                    <article class="service-card">
+                        <div class="service-card__icon" aria-hidden="true">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+                        </div>
+                        <h3>Deslocamento</h3>
+                        <p>Levamos a estrutura até o seu evento. Ida e volta já entram no orçamento.</p>
+                    </article>
+                    <article class="service-card">
+                        <div class="service-card__icon" aria-hidden="true">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+                        </div>
+                        <h3>Acompanhamento no evento</h3>
+                        <p>Acompanhamos o funcionamento do som durante todo o evento.</p>
+                    </article>
                 </div>
-
-                <div id="manual-toll-group" class="form-group" hidden>
-                    <label for="manual-toll">Pedágio estimado para o carro (ida e volta); o cálculo inclui a carretinha</label>
-                    <input type="text" id="manual-toll" inputmode="decimal" placeholder="0,00" aria-describedby="manual-toll-status">
-                    <div id="manual-toll-status" class="status-msg"></div>
-                </div>
-
-                <div class="total-banner">
-                    <div class="tag">Valor Estimado Total</div>
-                    <div class="price" id="res-total">-</div>
-                </div>
-
-                <a href="#" target="_blank" id="btn-whats" class="btn-whatsapp">
-          Confirmar Orçamento no WhatsApp
-        </a>
             </div>
-        </div>
+        </section>
+
+        <!-- 3. Como funciona -->
+        <section class="section" id="como-funciona" aria-labelledby="como-funciona-title">
+            <div class="container">
+                <span class="eyebrow">Como funciona</span>
+                <h2 id="como-funciona-title">Do orçamento ao grave em 4 passos</h2>
+                <p class="section-lead">Sem enrolação: você vê o valor estimado antes de falar com a gente.</p>
+                <ol class="steps grid grid--4">
+                    <li class="step">
+                        <h3>Simule</h3>
+                        <p>Informe data, horário, endereço e CEP do evento no simulador.</p>
+                    </li>
+                    <li class="step">
+                        <h3>Confirme no WhatsApp</h3>
+                        <p>Envie o orçamento pronto pelo WhatsApp com um toque.</p>
+                    </li>
+                    <li class="step">
+                        <h3>Montagem no local</h3>
+                        <p>Chegamos no endereço e montamos a estrutura de som.</p>
+                    </li>
+                    <li class="step">
+                        <h3>Festa</h3>
+                        <p>É só curtir. Acompanhamos o som e desmontamos no fim.</p>
+                    </li>
+                </ol>
+                <div class="btn-row btn-row--spaced">
+                    <a class="btn btn--primary" href="/orcamento">Simular orçamento</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Galeria -->
+        <section class="section section--alt" id="galeria" aria-labelledby="galeria-title">
+            <div class="container">
+                <span class="eyebrow">Galeria</span>
+                <h2 id="galeria-title">O paredão em ação</h2>
+                <p class="section-lead">Fotos de eventos em breve. Acompanhe também no Instagram <strong>@PAREDÃO_011</strong>.</p>
+                <!-- {{GALLERY_IMAGES}}: substituir /gallery/placeholder.svg por fotos reais em /gallery/ (ex.: /gallery/evento-01.jpg, 800x600) e ajustar o alt de cada uma. -->
+                <div class="gallery">
+                    <figure><img src="/gallery/placeholder.svg" alt="Foto em breve: paredão de som montado em festa" width="800" height="600" loading="lazy" decoding="async"></figure>
+                    <figure><img src="/gallery/placeholder.svg" alt="Foto em breve: detalhe dos alto-falantes do paredão" width="800" height="600" loading="lazy" decoding="async"></figure>
+                    <figure><img src="/gallery/placeholder.svg" alt="Foto em breve: montagem da estrutura de som no local do evento" width="800" height="600" loading="lazy" decoding="async"></figure>
+                    <figure><img src="/gallery/placeholder.svg" alt="Foto em breve: paredão de som iluminado durante evento noturno" width="800" height="600" loading="lazy" decoding="async"></figure>
+                    <figure><img src="/gallery/placeholder.svg" alt="Foto em breve: carro com carretinha transportando o paredão" width="800" height="600" loading="lazy" decoding="async"></figure>
+                    <figure><img src="/gallery/placeholder.svg" alt="Foto em breve: convidados curtindo a festa com o paredão" width="800" height="600" loading="lazy" decoding="async"></figure>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Área de atendimento -->
+        <section class="section" id="area" aria-labelledby="area-title">
+            <div class="container area">
+                <div>
+                    <span class="eyebrow">Área de atendimento</span>
+                    <h2 id="area-title">Atendemos toda a Grande São Paulo</h2>
+                    <p class="section-lead">Levamos a estrutura até o endereço da sua festa. O valor varia conforme a distância do percurso de ida e volta e os pedágios no caminho.</p>
+                </div>
+                <div class="area-box">
+                    <strong>Grande SP</strong>
+                    <p>Informe o CEP do evento no simulador e veja na hora o valor estimado, já com deslocamento e pedágios.</p>
+                    <a class="btn btn--primary" href="/orcamento">Calcular para meu CEP</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Prova social: renderizar apenas com depoimentos reais.
+        <section class="section section--alt" id="depoimentos" aria-labelledby="depoimentos-title">
+            <div class="container">
+                <span class="eyebrow">Depoimentos</span>
+                <h2 id="depoimentos-title">Quem já fez festa com a gente</h2>
+                {{TESTIMONIALS}}
+            </div>
+        </section>
+        -->
+
+        <!-- 7. FAQ -->
+        <section class="section section--alt" id="faq" aria-labelledby="faq-title">
+            <div class="container">
+                <span class="eyebrow">Dúvidas</span>
+                <h2 id="faq-title">Perguntas frequentes</h2>
+                <div class="faq">
+                    <details>
+                        <summary>Como o valor do orçamento é calculado?</summary>
+                        <div><p>O valor considera a duração do evento (calculada pelas datas e horários de início e fim), o deslocamento de ida e volta até o local e os pedágios do percurso. O simulador mostra o valor estimado total na hora.</p></div>
+                    </details>
+                    <details>
+                        <summary>Os pedágios entram no valor?</summary>
+                        <div><p>Sim. Os pedágios de ida e volta são calculados para o carro e a carretinha que transportam a estrutura. Se o simulador não conseguir estimar os pedágios da rota, ele pede que você informe o valor do pedágio do carro (ida e volta) e o cálculo já inclui a carretinha.</p></div>
+                    </details>
+                    <details>
+                        <summary>Como confirmo o orçamento?</summary>
+                        <div><p>Depois de calcular, toque em “Confirmar Orçamento no WhatsApp”. A mensagem já vai pronta com nome do responsável, endereço, CEP, data, horário, duração e valor.</p></div>
+                    </details>
+                    <details>
+                        <summary>Preciso pagar sinal para reservar?</summary>
+                        <div><p>Sim. A reserva é feita mediante sinal de 40% do valor, e o saldo é pago no dia do evento.</p></div>
+                    </details>
+                    <details>
+                        <summary>O que está incluso?</summary>
+                        <div><p>Estrutura de som profissional, montagem e desmontagem, deslocamento e acompanhamento durante o evento.</p></div>
+                    </details>
+                    <details>
+                        <summary>Vocês atendem fora da Grande São Paulo?</summary>
+                        <div><p>Atendemos a Grande São Paulo, e o valor varia com a distância e os pedágios. {{TODO}}: confirmar atendimento para outras regiões.</p></div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. CTA final -->
+        <section class="final-cta" aria-labelledby="cta-title">
+            <div class="container">
+                <h2 id="cta-title">Bora fazer barulho?</h2>
+                <p class="section-lead">Simule agora e receba o valor estimado do seu evento em segundos.</p>
+                <div class="btn-row">
+                    <a class="btn btn--primary" href="/orcamento">Simular orçamento</a>
+                    <a class="btn btn--ghost" href="https://wa.me/5511983569830" data-whatsapp target="_blank" rel="noopener">Falar no WhatsApp</a>
+                </div>
+            </div>
+        </section>
     </main>
 
+    <footer class="site-footer">
+        <div class="container">
+            <div>
+                <h2>Paredão 011</h2>
+                <p>Locação de estrutura completa de som automotivo para festas e eventos na Grande São Paulo.</p>
+            </div>
+            <div>
+                <h2>Contato</h2>
+                <ul>
+                    <li><a href="https://wa.me/5511983569830" data-whatsapp target="_blank" rel="noopener">WhatsApp: (11) 98356-9830</a></li>
+                    <li><a href="https://www.instagram.com/paredao_011/" target="_blank" rel="noopener">Instagram: @PAREDÃO_011</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2>Região</h2>
+                <ul>
+                    <li>Grande São Paulo</li>
+                    <li><a href="/orcamento">Simular orçamento</a></li>
+                </ul>
+            </div>
+            <p class="copyright">&copy; 2026 Paredão 011. Todos os direitos reservados.</p>
+        </div>
+    </footer>
 </body>
 
 </html>
