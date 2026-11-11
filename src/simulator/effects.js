@@ -56,7 +56,7 @@
         var start = performance.now();
         var tick = function (now) {
             var t = Math.min((now - start) / duration, 1);
-            var eased = 1 - Math.pow(1 - t, 3);
+            var eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; // ease-in-out
             overlay.textContent = formatter.format(from + (target - from) * eased);
             if (t < 1) frame = requestAnimationFrame(tick);
             else stop();

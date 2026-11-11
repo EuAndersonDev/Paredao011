@@ -33,7 +33,7 @@ api/trip.js        função Vercel: CEP -> distância de ida/volta e pedágios (
 src/config.js      preços, taxas, contato, SITE_URL (único arquivo de configuração)
 src/lib/           funções puras: pricing, whatsapp, datetime, format
 src/simulator/     formulário, exibição do resultado, controle e efeitos do simulador
-src/components/    header, footer, botão do WhatsApp, menu hambúrguer, revelação ao rolar
+src/components/    header, footer, botão do WhatsApp, menu hambúrguer, revelação ao rolar, parallax
 src/pages/         páginas HTML (montadas com os componentes no build)
 src/styles/        CSS
 public/            imagens, fontes, robots.txt, sitemap.xml, llms.txt
