@@ -122,12 +122,6 @@ h1 span {
   margin-bottom: 0.3rem;
 }
 
-.card .subtitle {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-bottom: 1.5rem;
-}
-
 .info-box {
   background: rgba(255, 255, 255, 0.07);
   border-left: 4px solid var(--accent);

@@ -24,5 +24,5 @@ A empresa atende a Grande São Paulo. O cliente informa no simulador o nome do r
 
 ## Contato
 
-- WhatsApp: +55 11 98356-9830 (https://wa.me/5511983569830)
-- Instagram: https://www.instagram.com/paredao_011/
+- WhatsApp: __PHONE_DISPLAY__ (__WHATSAPP_URL__)
+- Instagram: __INSTAGRAM_URL__

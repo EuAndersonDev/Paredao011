@@ -185,6 +185,12 @@ html { scroll-padding-top: 5rem; }
 }
 .breadcrumb a:hover { text-decoration: underline; }
 
+.privacy-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
 .sim-intro {
   color: var(--text-muted);
   margin-bottom: 1rem;
@@ -361,7 +367,6 @@ body.landing { padding-bottom: 0; }
 
 /* Cards */
 .grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
-@media (min-width: 640px) { .grid--2 { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 960px) { .grid--4 { grid-template-columns: repeat(4, 1fr); } }
 @media (min-width: 640px) and (max-width: 959px) { .grid--4 { grid-template-columns: repeat(2, 1fr); } }
 

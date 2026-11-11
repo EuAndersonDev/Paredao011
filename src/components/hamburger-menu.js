@@ -1,16 +1,7 @@
+// Hamburger menu (≤ 1024px): Esc, outside click and link click close it; Tab stays inside.
 (function () {
     "use strict";
 
-    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    // Keep every WhatsApp link pointing at the number configured in config.js (when loaded).
-    if (typeof CONFIG !== "undefined" && CONFIG.WHATSAPP_PHONE) {
-        document.querySelectorAll("a[data-whatsapp]").forEach(function (link) {
-            link.href = "https://wa.me/" + CONFIG.WHATSAPP_PHONE;
-        });
-    }
-
-    /* ---------- Hamburger menu ---------- */
     var toggle = document.querySelector(".menu-toggle");
     var nav = document.getElementById("menu-principal");
 
@@ -61,37 +52,4 @@
         if (mobileQuery.addEventListener) mobileQuery.addEventListener("change", onViewportChange);
         else if (mobileQuery.addListener) mobileQuery.addListener(onViewportChange);
     }
-
-    /* ---------- Scroll reveal (runs once per element) ---------- */
-    if (reduceMotion || !("IntersectionObserver" in window)) return;
-
-    var groups = document.querySelectorAll("[data-reveal-group]");
-    var singles = document.querySelectorAll("[data-reveal]");
-    var targets = [];
-    var viewportBottom = window.innerHeight;
-
-    var prepare = function (el, delay) {
-        // Never hide what is already on screen: avoids a flash and keeps LCP untouched.
-        if (el.getBoundingClientRect().top < viewportBottom) return;
-        el.style.setProperty("--reveal-delay", delay + "ms");
-        el.classList.add("reveal");
-        targets.push(el);
-    };
-
-    singles.forEach(function (el) { prepare(el, 0); });
-    groups.forEach(function (group) {
-        Array.prototype.forEach.call(group.children, function (child, index) {
-            prepare(child, Math.min(index, 6) * 80);
-        });
-    });
-
-    var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-        });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
-
-    targets.forEach(function (el) { observer.observe(el); });
 })();
