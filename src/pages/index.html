@@ -133,18 +133,44 @@
             <div class="container">
                 <span class="eyebrow" data-reveal>Galeria</span>
                 <h2 id="galeria-title" data-reveal>O paredão de som em ação</h2>
-                <p class="section-lead" data-reveal>Fotos de eventos em breve. Acompanhe também no <a href="__INSTAGRAM_URL__" target="_blank" rel="noopener">Instagram @PAREDÃO_011</a>.</p>
-                <!-- {{GALLERY_IMAGES}}: coloque as fotos em assets-src/gallery/, rode `python3 scripts/optimize-images.py` e troque cada <img> por:
-                     <picture><source srcset="/gallery/NOME-800.avif 800w, /gallery/NOME-1200.avif 1200w" type="image/avif" sizes="(min-width: 960px) 33vw, 50vw">
-                     <source srcset="/gallery/NOME-800.webp 800w, /gallery/NOME-1200.webp 1200w" type="image/webp" sizes="(min-width: 960px) 33vw, 50vw">
-                     <img src="/gallery/NOME-800.jpg" alt="DESCRIÇÃO" width="800" height="600" loading="lazy" decoding="async"></picture> -->
+                <p class="section-lead" data-reveal>Fotos reais do nosso paredão de som. Acompanhe mais no <a href="__INSTAGRAM_URL__" target="_blank" rel="noopener">Instagram @PAREDÃO_011</a>.</p>
+                <!-- Novas fotos: coloque em assets-src/gallery/, rode `python3 scripts/optimize-images.py` e copie um <figure> abaixo trocando o nome e o alt. -->
                 <div class="gallery" data-reveal-group>
-                    <figure><img src="/gallery/placeholder.svg" alt="Foto em breve: paredão de som montado em festa" width="800" height="600" loading="lazy" decoding="async"></figure>
-                    <figure><img src="/gallery/placeholder.svg" alt="Foto em breve: detalhe dos alto-falantes do paredão" width="800" height="600" loading="lazy" decoding="async"></figure>
-                    <figure><img src="/gallery/placeholder.svg" alt="Foto em breve: montagem da estrutura de som no local do evento" width="800" height="600" loading="lazy" decoding="async"></figure>
-                    <figure><img src="/gallery/placeholder.svg" alt="Foto em breve: paredão de som iluminado durante evento noturno" width="800" height="600" loading="lazy" decoding="async"></figure>
-                    <figure><img src="/gallery/placeholder.svg" alt="Foto em breve: carro com carretinha transportando o paredão" width="800" height="600" loading="lazy" decoding="async"></figure>
-                    <figure><img src="/gallery/placeholder.svg" alt="Foto em breve: convidados curtindo a festa com o paredão" width="800" height="600" loading="lazy" decoding="async"></figure>
+                    <figure>
+                        <picture>
+                            <source type="image/avif" srcset="/gallery/paredao-painel-led-480.avif 480w, /gallery/paredao-painel-led-720.avif 720w" sizes="(min-width: 960px) 220px, 100vw">
+                            <source type="image/webp" srcset="/gallery/paredao-painel-led-480.webp 480w, /gallery/paredao-painel-led-720.webp 720w" sizes="(min-width: 960px) 220px, 100vw">
+                            <img src="/gallery/paredao-painel-led-480.jpg" srcset="/gallery/paredao-painel-led-480.jpg 480w, /gallery/paredao-painel-led-720.jpg 720w" sizes="(min-width: 960px) 220px, 100vw" alt="Paredão 011 com painel de LED exibindo @Paredão_011, cornetas e alto-falantes em amarelo, preto e branco" width="720" height="900" loading="lazy" decoding="async">
+                        </picture>
+                    </figure>
+                    <figure>
+                        <picture>
+                            <source type="image/avif" srcset="/gallery/paredao-gramado-ceu-azul-480.avif 480w, /gallery/paredao-gramado-ceu-azul-720.avif 720w" sizes="(min-width: 960px) 220px, 50vw">
+                            <source type="image/webp" srcset="/gallery/paredao-gramado-ceu-azul-480.webp 480w, /gallery/paredao-gramado-ceu-azul-720.webp 720w" sizes="(min-width: 960px) 220px, 50vw">
+                            <img src="/gallery/paredao-gramado-ceu-azul-480.jpg" srcset="/gallery/paredao-gramado-ceu-azul-480.jpg 480w, /gallery/paredao-gramado-ceu-azul-720.jpg 720w" sizes="(min-width: 960px) 220px, 50vw" alt="Paredão de som montado sobre caminhão em gramado, com céu azul ao fundo" width="720" height="900" loading="lazy" decoding="async">
+                        </picture>
+                    </figure>
+                    <figure>
+                        <picture>
+                            <source type="image/avif" srcset="/gallery/paredao-logo-011-480.avif 480w, /gallery/paredao-logo-011-720.avif 720w" sizes="(min-width: 960px) 220px, 50vw">
+                            <source type="image/webp" srcset="/gallery/paredao-logo-011-480.webp 480w, /gallery/paredao-logo-011-720.webp 720w" sizes="(min-width: 960px) 220px, 50vw">
+                            <img src="/gallery/paredao-logo-011-480.jpg" srcset="/gallery/paredao-logo-011-480.jpg 480w, /gallery/paredao-logo-011-720.jpg 720w" sizes="(min-width: 960px) 220px, 50vw" alt="Vista traseira do paredão de som com o logo 011, cornetas e subwoofers" width="720" height="900" loading="lazy" decoding="async">
+                        </picture>
+                    </figure>
+                    <figure>
+                        <picture>
+                            <source type="image/avif" srcset="/gallery/paredao-traseira-sol-480.avif 480w, /gallery/paredao-traseira-sol-720.avif 720w" sizes="(min-width: 960px) 220px, 50vw">
+                            <source type="image/webp" srcset="/gallery/paredao-traseira-sol-480.webp 480w, /gallery/paredao-traseira-sol-720.webp 720w" sizes="(min-width: 960px) 220px, 50vw">
+                            <img src="/gallery/paredao-traseira-sol-480.jpg" srcset="/gallery/paredao-traseira-sol-480.jpg 480w, /gallery/paredao-traseira-sol-720.jpg 720w" sizes="(min-width: 960px) 220px, 50vw" alt="Paredão de som completo na carroceria do caminhão, montado ao ar livre em dia de sol" width="720" height="900" loading="lazy" decoding="async">
+                        </picture>
+                    </figure>
+                    <figure>
+                        <picture>
+                            <source type="image/avif" srcset="/gallery/paredao-evento-area-verde-480.avif 480w, /gallery/paredao-evento-area-verde-720.avif 720w" sizes="(min-width: 960px) 220px, 50vw">
+                            <source type="image/webp" srcset="/gallery/paredao-evento-area-verde-480.webp 480w, /gallery/paredao-evento-area-verde-720.webp 720w" sizes="(min-width: 960px) 220px, 50vw">
+                            <img src="/gallery/paredao-evento-area-verde-480.jpg" srcset="/gallery/paredao-evento-area-verde-480.jpg 480w, /gallery/paredao-evento-area-verde-720.jpg 720w" sizes="(min-width: 960px) 220px, 50vw" alt="Paredão de som montado em evento em área verde, ao lado de uma cerca de madeira" width="720" height="900" loading="lazy" decoding="async">
+                        </picture>
+                    </figure>
                 </div>
             </div>
         </section>
