@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Orçamento | Paredão 011 – Som para Eventos na Grande SP</title>
+    <meta name="description" content="Simule online o orçamento de locação de paredão de som para seu evento na Grande São Paulo: valor estimado por duração, deslocamento e pedágios, com confirmação no WhatsApp.">
+    <link rel="canonical" href="https://paredao011.vercel.app/orcamento">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="Paredão 011">
+    <meta property="og:title" content="Simulador de Orçamento | Paredão 011">
+    <meta property="og:description" content="Calcule o valor estimado da locação do paredão de som para seu evento e confirme pelo WhatsApp.">
+    <meta property="og:url" content="https://paredao011.vercel.app/orcamento">
+    <meta property="og:image" content="https://paredao011.vercel.app/background.jpg">
+    <meta name="theme-color" content="#090a0f">
+    <link rel="icon" type="image/jpeg" href="/paredao.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/site.css">
+    <script src="/config.js" defer></script>
+    <script src="/app.js" defer></script>
+    <script src="/site.js" defer></script>
+</head>
+
+<body>
+
+    <a class="skip-link" href="#conteudo">Pular para o simulador</a>
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a class="brand" href="/" aria-label="Paredão 011 – página inicial">
+                <img src="/paredao.jpg" alt="" width="36" height="36">
+                <span>PAREDÃO_<b>011</b></span>
+            </a>
+            <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-principal">
+                <span class="menu-toggle__bars" aria-hidden="true"></span>
+            </button>
+            <nav class="site-nav" id="menu-principal" aria-label="Menu principal">
+                <ul>
+                    <li><a href="/">Início</a></li>
+                    <li><a href="/#servicos">Serviços</a></li>
+                    <li><a href="/#como-funciona">Como funciona</a></li>
+                    <li><a class="nav-cta" href="/orcamento" aria-current="page">Simular orçamento</a></li>
+                    <li><a href="https://wa.me/5511983569830" data-whatsapp target="_blank" rel="noopener">WhatsApp</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="sim-hero">
+        <div class="badge">orçamentos</div>
+        <h1>@PAREDÃO_<span>011</span></h1>
+        <p>Locação de estrutura completa de som automotivo para festas e eventos na Grande SP.</p>
+    </div>
+
+    <main id="conteudo" class="sim-main">
+        <a class="back-link" href="/">&larr; Voltar para o início</a>
+        <p class="sim-intro">Preencha os dados do evento para ver o valor estimado e confirmar o orçamento direto no WhatsApp.</p>
+        <div class="card">
+            <h2>Simulador de orçamento</h2>
+            <br>
+            <div class="info-box">
+                O orçamento considera a duração do evento, o percurso de ida e volta e os pedágios.
+            </div>
+
+            <div class="form-group">
+                <label for="event-venue">Nome do responsável</label>
+                <input type="text" id="event-venue" autocomplete="organization" required>
+            </div>
+
+            <div class="form-group">
+                <label for="event-address">Endereço do evento</label>
+                <input type="text" id="event-address" autocomplete="street-address" required>
+            </div>
+
+            <div class="form-group">
+                <label for="event-start">Data de início do evento</label>
+                <input type="date" id="event-start" required>
+                <label for="event-start-time">Horário de início (24 horas)</label>
+                <input type="text" id="event-start-time" inputmode="numeric" maxlength="5" placeholder="HH:mm" autocomplete="off" required>
+            </div>
+
+            <div class="form-group">
+                <label for="event-end">Data de fim do evento</label>
+                <input type="date" id="event-end" required>
+                <label for="event-end-time">Horário de fim (24 horas)</label>
+                <input type="text" id="event-end-time" inputmode="numeric" maxlength="5" placeholder="HH:mm" autocomplete="off" required>
+            </div>
+
+            <div class="form-group">
+                <label for="dest-cep">CEP do Local do Evento</label>
+                <div class="input-row">
+                    <input type="text" id="dest-cep" placeholder="00000-000" maxlength="9" inputmode="numeric">
+                    <button class="btn-calc" id="btn-calcular" type="button">Calcular</button>
+                </div>
+                <div id="status" class="status-msg"></div>
+            </div>
+
+            <div id="result" class="result-box">
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span>CEP consultado</span>
+                        <strong id="res-endereco">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>Duração do evento</span>
+                        <strong id="res-horas">-</strong>
+                    </div>
+                </div>
+
+                <div id="manual-toll-group" class="form-group" hidden>
+                    <label for="manual-toll">Pedágio estimado para o carro (ida e volta); o cálculo inclui a carretinha</label>
+                    <input type="text" id="manual-toll" inputmode="decimal" placeholder="0,00" aria-describedby="manual-toll-status">
+                    <div id="manual-toll-status" class="status-msg"></div>
+                </div>
+
+                <div class="total-banner">
+                    <div class="tag">Valor Estimado Total</div>
+                    <div class="price" id="res-total">-</div>
+                </div>
+
+                <a href="#" target="_blank" id="btn-whats" class="btn-whatsapp">
+          Confirmar Orçamento no WhatsApp
+        </a>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>
