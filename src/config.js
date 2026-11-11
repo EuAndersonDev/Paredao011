@@ -6,7 +6,7 @@
 
     var CONFIG = {
         // ===================== EDIT PRICES HERE =====================
-        HOURLY_RATE_BRL: 160,               // valor por hora de evento (R$)
+        HOURLY_RATE_BRL: 190,               // valor por hora de evento (R$)
         CAR_KM_PER_LITER: 6,                // consumo do carro com a carretinha (km/l)
         GASOLINE_PRICE_BRL_PER_LITER: 7,    // preço da gasolina (R$/l)
         TOLL_VEHICLE_MULTIPLIER: 2,         // pedágio do carro x2 (carro + carretinha)
