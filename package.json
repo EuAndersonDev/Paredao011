@@ -1,0 +1,11 @@
+{
+  "name": "paredao011",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/build.mjs && npx -y serve@14.2.4 dist"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

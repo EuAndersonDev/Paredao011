@@ -1,0 +1,28 @@
+# Paredão 011
+
+> Paredão 011 (Instagram @paredao_011) aluga estrutura completa de som automotivo ("paredão de som") para festas e eventos na Grande São Paulo. O orçamento é calculado online e confirmado pelo WhatsApp.
+
+A empresa atende a Grande São Paulo. O cliente informa no simulador o nome do responsável, o endereço, a data e o horário de início e fim e o CEP do evento. O valor estimado é calculado a partir de três itens: a duração do evento em horas, o deslocamento de ida e volta até o local (distância da rota) e os pedágios do percurso, cobrados para o carro e a carretinha que transportam o equipamento. Quando o pedágio da rota não pode ser estimado automaticamente, o cliente informa o valor do pedágio do carro e o cálculo inclui a carretinha. A reserva é feita mediante sinal de 40% do valor, e o saldo é pago no dia do evento.
+
+## Serviços incluídos
+
+- Estrutura de som profissional (som automotivo)
+- Montagem e desmontagem no local do evento
+- Deslocamento de ida e volta
+- Acompanhamento durante o evento
+
+## Como contratar
+
+1. Simular o orçamento em [__SITE_URL__/orcamento](__SITE_URL__/orcamento).
+2. Tocar em "Confirmar Orçamento no WhatsApp"; a mensagem segue com os dados do evento e o valor estimado.
+3. Pagar o sinal de 40% para reservar a data.
+
+## Páginas
+
+- [Início](__SITE_URL__/): serviços, como funciona, regiões atendidas e perguntas frequentes.
+- [Simulador de orçamento](__SITE_URL__/orcamento): cálculo do valor estimado e envio pelo WhatsApp.
+
+## Contato
+
+- WhatsApp: +55 11 98356-9830 (https://wa.me/5511983569830)
+- Instagram: https://www.instagram.com/paredao_011/

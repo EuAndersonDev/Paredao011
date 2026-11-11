@@ -1,0 +1,18 @@
+# Paredão 011 — __SITE_URL__
+User-agent: *
+Allow: /
+
+# AI assistants and search crawlers are welcome.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: __SITE_URL__/sitemap.xml
