@@ -1,0 +1,69 @@
+        <div class="card">
+            <h2>Simulador de orçamento</h2>
+            <br>
+            <div class="info-box">
+                O orçamento considera a duração do evento, o percurso de ida e volta e os pedágios.
+            </div>
+
+            <div class="form-group">
+                <label for="event-venue">Nome do responsável</label>
+                <input type="text" id="event-venue" autocomplete="organization" minlength="2" maxlength="80" required>
+            </div>
+
+            <div class="form-group">
+                <label for="event-address">Endereço do evento</label>
+                <input type="text" id="event-address" autocomplete="street-address" required>
+            </div>
+
+            <div class="form-group">
+                <label for="event-start">Data de início do evento</label>
+                <input type="date" id="event-start" required>
+                <label for="event-start-time">Horário de início (24 horas)</label>
+                <input type="text" id="event-start-time" inputmode="numeric" maxlength="5" placeholder="HH:mm" autocomplete="off" required>
+            </div>
+
+            <div class="form-group">
+                <label for="event-end">Data de fim do evento</label>
+                <input type="date" id="event-end" required>
+                <label for="event-end-time">Horário de fim (24 horas)</label>
+                <input type="text" id="event-end-time" inputmode="numeric" maxlength="5" placeholder="HH:mm" autocomplete="off" required>
+            </div>
+
+            <div class="form-group">
+                <label for="dest-cep">CEP do Local do Evento</label>
+                <div class="input-row">
+                    <input type="text" id="dest-cep" placeholder="00000-000" maxlength="9" inputmode="numeric">
+                    <button class="btn-calc" id="btn-calcular" type="button">Calcular</button>
+                </div>
+                <p class="privacy-note">Seus dados não são armazenados; são usados apenas para montar a mensagem no WhatsApp.</p>
+                <div id="status" class="status-msg"></div>
+            </div>
+
+            <div id="result" class="result-box">
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span>CEP consultado</span>
+                        <strong id="res-endereco">-</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>Duração do evento</span>
+                        <strong id="res-horas">-</strong>
+                    </div>
+                </div>
+
+                <div id="manual-toll-group" class="form-group" hidden>
+                    <label for="manual-toll">Pedágio estimado para o carro (ida e volta); o cálculo inclui a carretinha</label>
+                    <input type="text" id="manual-toll" inputmode="decimal" placeholder="0,00" aria-describedby="manual-toll-status">
+                    <div id="manual-toll-status" class="status-msg"></div>
+                </div>
+
+                <div class="total-banner">
+                    <div class="tag">Valor Estimado Total</div>
+                    <div class="price" id="res-total">-</div>
+                </div>
+
+                <a href="#" target="_blank" id="btn-whats" class="btn-whatsapp">
+          Confirmar Orçamento no WhatsApp
+        </a>
+            </div>
+        </div>

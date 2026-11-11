@@ -1,0 +1,10 @@
+/* TEAM */
+Business: Paredão 011
+Instagram: @paredao_011
+Location: Grande São Paulo, Brasil
+
+/* SITE */
+Last update: __BUILD_DATE__
+Language: Português (pt-BR)
+Standards: HTML5, CSS3, JavaScript
+Fonts: Plus Jakarta Sans, Space Grotesk (SIL OFL 1.1)

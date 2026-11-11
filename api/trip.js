@@ -1,11 +1,14 @@
+// Prices, fees and the origin CEP are shared with the site through src/config.js.
+const SITE_CONFIG = require("../src/config.js");
+
 const CONFIG = Object.freeze({
-  ORIGIN_CEP: "08260280",
+  ORIGIN_CEP: SITE_CONFIG.ORIGIN_CEP,
   CACHE_TTL_MS: 6 * 60 * 60 * 1000,
   CACHE_MAX_ENTRIES: 200,
   NEGATIVE_TTL_MS: 10 * 60 * 1000,
   MAX_BODY_BYTES: 512,
   REQUEST_TIMEOUT_MS: 8000,
-  TOLL_VEHICLE_MULTIPLIER: 2
+  TOLL_VEHICLE_MULTIPLIER: SITE_CONFIG.TOLL_VEHICLE_MULTIPLIER
 });
 
 let originAddressCache = null;

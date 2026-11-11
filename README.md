@@ -1,21 +1,44 @@
-# Paredao011
-Site do Paredao011
+# Paredão 011
 
-- `/` → `index.html` — landing page
-- `/orcamento` → `orcamento.html` — simulador de orçamento (`app.js` + `config.js` + `api/trip.js`)
-- `site.css` / `site.js` — header, menu hambúrguer e estilos da landing (compartilhados)
-- `vercel.json` — `cleanUrls` para `/orcamento` funcionar ao recarregar
+Site da Paredão 011 (aluguel de paredão de som na Grande SP): landing page (`/`) e simulador de orçamento (`/orcamento`).
+HTML/CSS/JS puro, sem dependências; um build em Node gera `dist/`, que a Vercel publica. A função `api/trip.js` calcula distância e pedágios.
 
-## Rodar localmente
+## Rodar
 
-Requer a variável `GOOGLE_MAPS_API_KEY` (usada por `api/trip.js`).
+Requer Node 20+.
 
 ```bash
-npx vercel dev
+npm run dev      # build + servidor local em http://localhost:3000 (inclui /api/trip)
+npm test         # testes de preço, datas, WhatsApp e build
+npm run check    # testes + build (o mesmo que o CI roda)
 ```
 
-## Deploy
+Para o simulador calcular rotas localmente, crie `.env.local` (já ignorado pelo git) com `GOOGLE_MAPS_API_KEY=...`.
 
-```bash
-npx vercel --prod
+## Mudar preços, telefone ou endereço do site
+
+Tudo fica em **`src/config.js`**, no bloco marcado `EDIT PRICES HERE`: valor por hora, consumo do carro, gasolina, multiplicador de pedágio e sinal (%).
+Telefone do WhatsApp, Instagram, `SITE_URL` e dados de SEO (`BUSINESS`) estão no mesmo arquivo.
+Depois de editar, rode `npm run check`: se um preço mudou de propósito, os testes de referência (`tests/fixtures/golden-quotes.json`) vão falhar e precisam ser regravados.
+
+## Vercel
+
+- Variável de ambiente: **`GOOGLE_MAPS_API_KEY`** (Settings → Environment Variables). Fica só no servidor; não use prefixo público.
+- `vercel.json` já define o build (`npm run build` → `dist/`), URLs limpas, redirecionamento e cabeçalhos de segurança.
+
+## Estrutura
+
+```
+api/trip.js        função Vercel: CEP -> distância de ida/volta e pedágios (usa a chave)
+src/config.js      preços, taxas, contato, SITE_URL (único arquivo de configuração)
+src/lib/           funções puras: pricing, whatsapp, datetime, format
+src/simulator/     formulário, exibição do resultado, controle e efeitos do simulador
+src/components/    header, footer, botão do WhatsApp, menu hambúrguer, revelação ao rolar
+src/pages/         páginas HTML (montadas com os componentes no build)
+src/styles/        CSS
+public/            imagens, fontes, robots.txt, sitemap.xml, llms.txt
+scripts/           build, servidor local, otimização de imagens
+tests/             testes (node:test)
+docs/AUDIT.md      auditoria de segurança
+SEO_CHECKLIST.md   tarefas manuais de SEO
 ```

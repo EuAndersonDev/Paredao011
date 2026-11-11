@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Simulador de Orçamento de Paredão de Som | Paredão 011</title>
+    <meta name="description" content="Simule o orçamento do aluguel de paredão de som para seu evento na Grande São Paulo: valor por duração, deslocamento e pedágios. Confirme no WhatsApp.">
+    <link rel="canonical" href="__SITE_URL__/orcamento">
+    <!-- @verification -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="Paredão 011">
+    <meta property="og:title" content="Simulador de Orçamento de Paredão de Som | Paredão 011">
+    <meta property="og:description" content="Calcule o valor estimado do aluguel do paredão de som para seu evento na Grande SP e confirme pelo WhatsApp.">
+    <meta property="og:url" content="__SITE_URL__/orcamento">
+    <meta property="og:image" content="__SITE_URL__/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Paredão de som da Paredão 011 com o texto Aluguel de paredão de som na Grande SP">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Simulador de Orçamento de Paredão de Som | Paredão 011">
+    <meta name="twitter:description" content="Calcule o valor estimado do aluguel do paredão de som para seu evento na Grande SP e confirme pelo WhatsApp.">
+    <meta name="twitter:image" content="__SITE_URL__/og-image.jpg">
+    <meta name="theme-color" content="#090a0f">
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="preload" href="/fonts/plus-jakarta-sans-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/space-grotesk-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/img/bg-800.avif" as="image" type="image/avif" media="(max-width: 899px)">
+    <link rel="preload" href="/img/bg-1600.avif" as="image" type="image/avif" media="(min-width: 900px)">
+    <link rel="stylesheet" href="/css/site.css">
+    <script>document.documentElement.classList.add("js")</script>
+    <script src="/js/orcamento.js" defer></script>
+    <!-- @jsonld -->
+</head>
+
+<body>
+
+    <a class="skip-link" href="#conteudo">Pular para o simulador</a>
+    <!-- @include components/header.html -->
+
+    <div class="sim-hero">
+        <div class="badge">orçamentos</div>
+        <h1>@PAREDÃO_<span>011</span></h1>
+        <p>Simulador de orçamento para aluguel de paredão de som: locação de estrutura completa de som automotivo para festas e eventos na Grande SP.</p>
+    </div>
+
+    <main id="conteudo" class="sim-main">
+        <nav class="breadcrumb" aria-label="Trilha de navegação">
+            <ol>
+                <li><a href="/">&larr; Início</a></li>
+                <li aria-current="page">Simulador de orçamento</li>
+            </ol>
+        </nav>
+        <p class="sim-intro">Preencha os dados do evento para ver o valor estimado e confirmar o orçamento direto no WhatsApp.</p>
+        <!-- @include simulator/form.html -->
+    </main>
+
+    <!-- @include components/whatsapp-button.html -->
+</body>
+
+</html>

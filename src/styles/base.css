@@ -1,3 +1,19 @@
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("/fonts/plus-jakarta-sans-latin-wght.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/space-grotesk-latin-700.woff2") format("woff2");
+}
+
 :root {
   --bg: #090a0f;
   --card-bg: rgba(12, 13, 16, 0.94);
@@ -13,14 +29,36 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background:
-    linear-gradient(rgba(5, 6, 8, 0.64), rgba(5, 6, 8, 0.78)),
-    url("background.jpg") center center / cover fixed,
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font-main);
   line-height: 1.5;
   padding-bottom: 50px;
+}
+
+/* Fixed photo layer (replaces background-attachment: fixed, which repaints on scroll). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(rgba(5, 6, 8, 0.64), rgba(5, 6, 8, 0.78)),
+    url("/img/bg-800.jpg") center / cover no-repeat;
+  background:
+    linear-gradient(rgba(5, 6, 8, 0.64), rgba(5, 6, 8, 0.78)),
+    image-set(url("/img/bg-800.avif") type("image/avif"), url("/img/bg-800.webp") type("image/webp"), url("/img/bg-800.jpg") type("image/jpeg")) center / cover no-repeat;
+}
+
+@media (min-width: 900px) {
+  body::before {
+    background:
+      linear-gradient(rgba(5, 6, 8, 0.64), rgba(5, 6, 8, 0.78)),
+      url("/img/bg-1600.jpg") center / cover no-repeat;
+    background:
+      linear-gradient(rgba(5, 6, 8, 0.64), rgba(5, 6, 8, 0.78)),
+      image-set(url("/img/bg-1600.avif") type("image/avif"), url("/img/bg-1600.webp") type("image/webp"), url("/img/bg-1600.jpg") type("image/jpeg")) center / cover no-repeat;
+  }
 }
 
 .sim-hero {
@@ -84,12 +122,6 @@ h1 span {
   margin-bottom: 0.3rem;
 }
 
-.card .subtitle {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-bottom: 1.5rem;
-}
-
 .info-box {
   background: rgba(255, 255, 255, 0.07);
   border-left: 4px solid var(--accent);
@@ -126,7 +158,6 @@ input {
   border-radius: 0.6rem;
   font-size: 1rem;
   outline: none;
-  transition: border 0.2s;
   color-scheme: dark;
 }
 
@@ -143,7 +174,6 @@ button.btn-calc {
   border-radius: 0.6rem;
   cursor: pointer;
   white-space: nowrap;
-  transition: filter 0.2s;
 }
 
 button.btn-calc:hover {
@@ -235,7 +265,6 @@ button.btn-calc:disabled {
   padding: 1rem;
   border-radius: 0.6rem;
   font-size: 1rem;
-  transition: filter 0.2s;
 }
 
 .btn-whatsapp:hover {
