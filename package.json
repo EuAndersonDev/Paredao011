@@ -5,7 +5,8 @@
     "dev": "node scripts/dev.mjs",
     "build": "node scripts/build.mjs",
     "test": "node --test tests/*.test.js",
-    "check": "npm test && npm run build"
+    "check": "npm test && npm run build",
+    "test:update": "node scripts/update-golden.mjs"
   },
   "engines": {
     "node": ">=20"

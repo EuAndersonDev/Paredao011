@@ -1,5 +1,5 @@
 {
-  "_about": "Recorded from the ORIGINAL simulator UI (app.js before the refactor) with /api/trip mocked. Do not edit by hand: these values lock the current pricing and message format.",
+  "_about": "Locks the simulator output for HOURLY_RATE_BRL=190. Originally recorded from the real UI; after an intentional price change regenerate with \"npm run test:update\" and review the diff.",
   "form": {
     "venueName": "Cliente Teste",
     "eventAddress": "Rua Exemplo, 100",
@@ -25,10 +25,10 @@
       "manualToll": null,
       "manualTollEntry": null,
       "expected": {
-        "total": "R$ 349,87",
+        "total": "R$ 409,87",
         "hours": "2 horas",
         "status": "Consultando o CEP e calculando a rota...",
-        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2020%3A00%20%C3%A0s%2022%3A00%20%E2%80%94%202%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A0349%2C87%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0139%2C95%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A0209%2C92%0A"
+        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2020%3A00%20%C3%A0s%2022%3A00%20%E2%80%94%202%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A0409%2C87%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0163%2C95%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A0245%2C92%0A"
       }
     },
     {
@@ -50,10 +50,10 @@
       "manualToll": null,
       "manualTollEntry": null,
       "expected": {
-        "total": "R$ 2.298,20",
+        "total": "R$ 2.703,20",
         "hours": "13,5 horas",
         "status": "Consultando o CEP e calculando a rota...",
-        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2010%3A00%20%C3%A0s%2023%3A30%20%E2%80%94%2013%2C5%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A02.298%2C20%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0919%2C28%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A01.378%2C92%0A"
+        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2010%3A00%20%C3%A0s%2023%3A30%20%E2%80%94%2013%2C5%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A02.703%2C20%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A01.081%2C28%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A01.621%2C92%0A"
       }
     },
     {
@@ -75,10 +75,10 @@
       "manualToll": null,
       "manualTollEntry": null,
       "expected": {
-        "total": "R$ 1.018,20",
+        "total": "R$ 1.183,20",
         "hours": "5,5 horas",
         "status": "Consultando o CEP e calculando a rota...",
-        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2022%3A00%20%C3%A0s%2003%3A30%20%E2%80%94%205%2C5%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A01.018%2C20%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0407%2C28%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A0610%2C92%0A"
+        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2022%3A00%20%C3%A0s%2003%3A30%20%E2%80%94%205%2C5%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A01.183%2C20%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0473%2C28%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A0709%2C92%0A"
       }
     },
     {
@@ -100,10 +100,10 @@
       "manualToll": null,
       "manualTollEntry": null,
       "expected": {
-        "total": "R$ 1.802,45",
+        "total": "R$ 2.042,45",
         "hours": "8 horas",
         "status": "Consultando o CEP e calculando a rota...",
-        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2018%3A00%20%C3%A0s%2002%3A00%20%E2%80%94%208%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A01.802%2C45%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0720%2C98%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A01.081%2C47%0A"
+        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2018%3A00%20%C3%A0s%2002%3A00%20%E2%80%94%208%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A02.042%2C45%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0816%2C98%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A01.225%2C47%0A"
       }
     },
     {
@@ -125,10 +125,10 @@
       "manualToll": null,
       "manualTollEntry": null,
       "expected": {
-        "total": "R$ 711,17",
+        "total": "R$ 831,17",
         "hours": "4 horas",
         "status": "Consultando o CEP e calculando a rota...",
-        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2014%3A00%20%C3%A0s%2018%3A00%20%E2%80%94%204%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A0711%2C17%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0284%2C47%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A0426%2C70%0A"
+        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2014%3A00%20%C3%A0s%2018%3A00%20%E2%80%94%204%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A0831%2C17%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0332%2C47%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A0498%2C70%0A"
       }
     },
     {
@@ -175,10 +175,10 @@
       "manualToll": null,
       "manualTollEntry": null,
       "expected": {
-        "total": "R$ 669,87",
+        "total": "R$ 789,87",
         "hours": "4 horas",
         "status": "Consultando o CEP e calculando a rota...",
-        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2020%3A00%20%C3%A0s%2000%3A00%20%E2%80%94%204%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A0669%2C87%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0267%2C95%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A0401%2C92%0A"
+        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2020%3A00%20%C3%A0s%2000%3A00%20%E2%80%94%204%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A0789%2C87%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0315%2C95%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A0473%2C92%0A"
       }
     },
     {
@@ -200,10 +200,10 @@
       "manualToll": "12,50",
       "manualTollEntry": "fill",
       "expected": {
-        "total": "R$ 896,17",
+        "total": "R$ 1.046,17",
         "hours": "5 horas",
         "status": "",
-        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2020%3A00%20%C3%A0s%2001%3A00%20%E2%80%94%205%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A0896%2C17%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0358%2C47%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A0537%2C70%0A"
+        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2020%3A00%20%C3%A0s%2001%3A00%20%E2%80%94%205%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A01.046%2C17%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0418%2C47%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A0627%2C70%0A"
       }
     },
     {
@@ -225,10 +225,10 @@
       "manualToll": "12,50",
       "manualTollEntry": "type",
       "expected": {
-        "total": "R$ 873,17",
+        "total": "R$ 1.023,17",
         "hours": "5 horas",
         "status": "",
-        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2020%3A00%20%C3%A0s%2001%3A00%20%E2%80%94%205%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A0873%2C17%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0349%2C27%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A0523%2C90%0A"
+        "whatsappHref": "https://wa.me/5511983569830?text=%20%40Pared%C3%A3o_011%20%E2%80%93%20Or%C3%A7amento%0A%0A%20-%20Nome%20do%20responsavel%3A%20Cliente%20Teste%0A%20-%20Endere%C3%A7o%3A%20Rua%20Exemplo%2C%20100%0A%20-%20CEP%3A%2001001000%0A%20-%20Data%3A%2020%2F03%2F2027%0A%20-%20Hor%C3%A1rio%3A%2020%3A00%20%C3%A0s%2001%3A00%20%E2%80%94%205%20horas%0A%0A%20-%20Valor%3A%20R%24%C2%A01.023%2C17%0A%0AIncluso%3A%0A%E2%80%A2%20Estrutura%20de%20som%20profissional%0A%E2%80%A2%20Montagem%20e%20desmontagem%0A%E2%80%A2%20Deslocamento%0A%E2%80%A2%20Acompanhamento%20durante%20o%20evento%0A%0A%20-%20Reserva%20mediante%20sinal%20de%2040%25%3A%20R%24%C2%A0409%2C27%0A%20-%20Saldo%20no%20dia%3A%20R%24%C2%A0613%2C90%0A"
       }
     }
   ]

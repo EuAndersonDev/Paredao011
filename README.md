@@ -19,7 +19,14 @@ Para o simulador calcular rotas localmente, crie `.env.local` (já ignorado pelo
 
 Tudo fica em **`src/config.js`**, no bloco marcado `EDIT PRICES HERE`: valor por hora, consumo do carro, gasolina, multiplicador de pedágio e sinal (%).
 Telefone do WhatsApp, Instagram, `SITE_URL` e dados de SEO (`BUSINESS`) estão no mesmo arquivo.
-Depois de editar, rode `npm run check`: se um preço mudou de propósito, os testes de referência (`tests/fixtures/golden-quotes.json`) vão falhar e precisam ser regravados.
+Depois de editar um preço, rode:
+
+```bash
+npm run test:update   # regrava os valores de referência dos testes com os novos preços
+npm run check         # testes + build
+```
+
+Os testes de referência (`tests/fixtures/golden-quotes.json`) travam os totais de propósito: se um preço mudar sem `test:update`, o CI fica vermelho. Confira a diferença no commit antes de enviar.
 
 ## Vercel
 
@@ -40,5 +47,4 @@ public/            imagens, fontes, robots.txt, sitemap.xml, llms.txt
 scripts/           build, servidor local, otimização de imagens
 tests/             testes (node:test)
 docs/AUDIT.md      auditoria de segurança
-SEO_CHECKLIST.md   tarefas manuais de SEO
 ```
