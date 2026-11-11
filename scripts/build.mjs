@@ -21,7 +21,7 @@ const CSS = ["styles/base.css", "styles/site.css"];
 const PAGES = {
   "index.html": {
     current: "home",
-    js: ["components/hamburger-menu.js", "components/scroll-reveal.js"],
+    js: ["components/hamburger-menu.js", "components/scroll-reveal.js", "components/parallax.js"],
     bundle: "home.js"
   },
   "orcamento.html": {
@@ -29,7 +29,7 @@ const PAGES = {
     js: [
       "config.js", "lib/format.js", "lib/datetime.js", "lib/pricing.js", "lib/whatsapp.js",
       "simulator/result-view.js", "simulator/form.js", "simulator/simulator.js", "simulator/effects.js",
-      "components/hamburger-menu.js"
+      "components/hamburger-menu.js", "components/parallax.js"
     ],
     bundle: "orcamento.js"
   }

@@ -36,12 +36,13 @@ body {
   padding-bottom: 50px;
 }
 
-/* Fixed photo layer (replaces background-attachment: fixed, which repaints on scroll). */
-body::before {
-  content: "";
+/* Fixed photo layer (replaces background-attachment: fixed, which repaints on scroll).
+   It is a real element (.page-bg, in the header component) so the parallax can move it. */
+.page-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
+  pointer-events: none;
   background:
     linear-gradient(rgba(5, 6, 8, 0.64), rgba(5, 6, 8, 0.78)),
     url("/img/bg-800.jpg") center / cover no-repeat;
@@ -51,7 +52,7 @@ body::before {
 }
 
 @media (min-width: 900px) {
-  body::before {
+  .page-bg {
     background:
       linear-gradient(rgba(5, 6, 8, 0.64), rgba(5, 6, 8, 0.78)),
       url("/img/bg-1600.jpg") center / cover no-repeat;
