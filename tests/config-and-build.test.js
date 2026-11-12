@@ -40,3 +40,10 @@ test("build output: pages, discovery files, no secrets, no leftover tokens", () 
         assert.match(html, /<link rel="canonical" href="https:\/\//);
     }
 });
+
+test("every video, preview and poster referenced on the home page exists in the build", () => {
+    const html = readFileSync(join(ROOT, "dist/index.html"), "utf8");
+    const refs = [...html.matchAll(/(?:src|data-preview|data-poster)="(\/videos\/[^"]+)"/g)].map((m) => m[1]);
+    assert.ok(refs.length >= 15, `expected full + preview + poster per video, found ${refs.length}`);
+    for (const ref of refs) assert.ok(existsSync(join(ROOT, "dist", ref)), ref);
+});

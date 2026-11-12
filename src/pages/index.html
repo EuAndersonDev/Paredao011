@@ -175,8 +175,108 @@
             </div>
         </section>
 
+        <!-- 4b. Vídeos: prévias de 5 s passam sozinhas; clique toca o vídeo inteiro com som (components/video-carousel.js).
+             Novos vídeos: coloque em assets-src/videos/ e rode scripts/optimize-videos.sh. -->
+        <section class="section" id="videos" aria-labelledby="videos-title">
+            <div class="container">
+                <span class="eyebrow" data-reveal>Vídeos</span>
+                <h2 id="videos-title" data-reveal>Veja e ouça o paredão de som</h2>
+                <p class="section-lead" data-reveal>As prévias passam sozinhas. Toque no vídeo para assistir inteiro, com som.</p>
+                <div class="video-carousel" data-video-carousel role="region" aria-roledescription="carrossel" aria-label="Vídeos do paredão de som">
+                    <ol class="video-carousel__track">
+                        <li class="video-slide" aria-roledescription="slide" aria-label="1 de 5: Paredão iluminado ao entardecer" data-preview="/videos/paredao-iluminado-entardecer-preview.mp4">
+                            <figure>
+                                <div class="video-slide__frame">
+                                    <video controls preload="none" playsinline width="480" height="854" data-poster="/videos/paredao-iluminado-entardecer-poster.webp" aria-label="Paredão iluminado ao entardecer">
+                                        <source src="/videos/paredao-iluminado-entardecer.mp4" type="video/mp4">
+                                    </video>
+                                    <div class="video-slide__progress" aria-hidden="true"><span></span></div>
+                                    <button class="video-slide__play" type="button" hidden>
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                        Assistir completo com som
+                                    </button>
+                                </div>
+                                <figcaption>Paredão iluminado ao entardecer</figcaption>
+                            </figure>
+                        </li>
+                        <li class="video-slide" aria-roledescription="slide" aria-label="2 de 5: Os alto-falantes e os LEDs de perto" data-preview="/videos/paredao-leds-de-perto-preview.mp4">
+                            <figure>
+                                <div class="video-slide__frame">
+                                    <video controls preload="none" playsinline width="480" height="854" data-poster="/videos/paredao-leds-de-perto-poster.webp" aria-label="Os alto-falantes e os LEDs de perto">
+                                        <source src="/videos/paredao-leds-de-perto.mp4" type="video/mp4">
+                                    </video>
+                                    <div class="video-slide__progress" aria-hidden="true"><span></span></div>
+                                    <button class="video-slide__play" type="button" hidden>
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                        Assistir completo com som
+                                    </button>
+                                </div>
+                                <figcaption>Os alto-falantes e os LEDs de perto</figcaption>
+                            </figure>
+                        </li>
+                        <li class="video-slide" aria-roledescription="slide" aria-label="3 de 5: DJ e o paredão aceso à noite" data-preview="/videos/dj-e-paredao-a-noite-preview.mp4">
+                            <figure>
+                                <div class="video-slide__frame">
+                                    <video controls preload="none" playsinline width="480" height="854" data-poster="/videos/dj-e-paredao-a-noite-poster.webp" aria-label="DJ e o paredão aceso à noite">
+                                        <source src="/videos/dj-e-paredao-a-noite.mp4" type="video/mp4">
+                                    </video>
+                                    <div class="video-slide__progress" aria-hidden="true"><span></span></div>
+                                    <button class="video-slide__play" type="button" hidden>
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                        Assistir completo com som
+                                    </button>
+                                </div>
+                                <figcaption>DJ e o paredão aceso à noite</figcaption>
+                            </figure>
+                        </li>
+                        <li class="video-slide" aria-roledescription="slide" aria-label="4 de 5: Festa à noite com as luzes do paredão" data-preview="/videos/festa-a-noite-luzes-preview.mp4">
+                            <figure>
+                                <div class="video-slide__frame">
+                                    <video controls preload="none" playsinline width="480" height="854" data-poster="/videos/festa-a-noite-luzes-poster.webp" aria-label="Festa à noite com as luzes do paredão">
+                                        <source src="/videos/festa-a-noite-luzes.mp4" type="video/mp4">
+                                    </video>
+                                    <div class="video-slide__progress" aria-hidden="true"><span></span></div>
+                                    <button class="video-slide__play" type="button" hidden>
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                        Assistir completo com som
+                                    </button>
+                                </div>
+                                <figcaption>Festa à noite com as luzes do paredão</figcaption>
+                            </figure>
+                        </li>
+                        <li class="video-slide" aria-roledescription="slide" aria-label="5 de 5: Público curtindo a festa" data-preview="/videos/publico-curtindo-a-festa-preview.mp4">
+                            <figure>
+                                <div class="video-slide__frame">
+                                    <video controls preload="none" playsinline width="480" height="854" data-poster="/videos/publico-curtindo-a-festa-poster.webp" aria-label="Público curtindo a festa">
+                                        <source src="/videos/publico-curtindo-a-festa.mp4" type="video/mp4">
+                                    </video>
+                                    <div class="video-slide__progress" aria-hidden="true"><span></span></div>
+                                    <button class="video-slide__play" type="button" hidden>
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                        Assistir completo com som
+                                    </button>
+                                </div>
+                                <figcaption>Público curtindo a festa</figcaption>
+                            </figure>
+                        </li>
+                    </ol>
+                    <div class="video-carousel__controls" hidden>
+                        <button class="video-carousel__btn" type="button" data-prev aria-label="Vídeo anterior">
+                            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <div class="video-carousel__dots" role="group" aria-label="Escolher vídeo"></div>
+                        <button class="video-carousel__btn" type="button" data-next aria-label="Próximo vídeo">
+                            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                        </button>
+                        <button class="video-carousel__toggle" type="button" data-toggle aria-pressed="false">Pausar prévias</button>
+                    </div>
+                    <p class="visually-hidden" aria-live="polite" data-status></p>
+                </div>
+            </div>
+        </section>
+
         <!-- 5. Regiões atendidas -->
-        <section class="section" id="regioes" aria-labelledby="regioes-title">
+        <section class="section section--alt" id="regioes" aria-labelledby="regioes-title">
             <div class="container area">
                 <div data-reveal>
                     <span class="eyebrow">Regiões atendidas</span>
@@ -205,7 +305,7 @@
         -->
 
         <!-- 7. FAQ (o JSON-LD FAQPage é gerado a partir deste texto no build) -->
-        <section class="section section--alt" id="faq" aria-labelledby="faq-title">
+        <section class="section" id="faq" aria-labelledby="faq-title">
             <div class="container">
                 <span class="eyebrow" data-reveal>Dúvidas</span>
                 <h2 id="faq-title" data-reveal>Perguntas frequentes sobre o aluguel de paredão de som</h2>
