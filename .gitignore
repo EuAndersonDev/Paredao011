@@ -3,3 +3,6 @@
 .env*
 dist
 node_modules
+
+# Original videos are large; keep them locally (scripts/optimize-videos.sh reads them)
+assets-src/videos/
