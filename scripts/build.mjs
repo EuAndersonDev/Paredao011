@@ -21,7 +21,7 @@ const CSS = ["styles/base.css", "styles/site.css"];
 const PAGES = {
   "index.html": {
     current: "home",
-    js: ["components/hamburger-menu.js", "components/scroll-reveal.js", "components/parallax.js", "components/video-carousel.js"],
+    js: ["components/hamburger-menu.js", "components/scroll-reveal.js", "components/parallax.js", "components/video-scroll.js"],
     bundle: "home.js"
   },
   "orcamento.html": {

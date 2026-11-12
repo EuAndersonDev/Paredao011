@@ -1,4 +1,4 @@
-// Scroll reveal: fades sections in once. Only runs with JS and without reduced motion,
+// Scroll reveal: fades sections in, scrolling down or up. Only runs with JS and without reduced motion,
 // and never hides what is already on screen, so content stays visible and indexable.
 (function () {
     "use strict";
@@ -26,11 +26,18 @@
         });
     });
 
+    // Works both ways: scrolling down, elements rise from below; scrolling up, they come down
+    // from above. When an element leaves the screen it resets, so it animates again next time.
     var observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
+            var el = entry.target;
+            if (entry.isIntersecting) {
+                el.classList.add("is-visible");
+            } else {
+                // Left above the viewport -> next entry comes from above (scrolling up).
+                el.classList.toggle("from-above", entry.boundingClientRect.top < 0);
+                el.classList.remove("is-visible");
+            }
         });
     }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
 

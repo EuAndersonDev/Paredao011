@@ -1,12 +1,12 @@
 // Parallax: layers move at different speeds while scrolling, with eased (smoothed) motion.
-// Desktop with a mouse only, and never with prefers-reduced-motion. Only the `translate`
+// Desktop and mobile, scrolling down or up; never with prefers-reduced-motion. Only the `translate`
 // property is changed, so there is no layout shift and content stays where it is without JS.
 //   data-parallax="-0.2"        speed relative to the element's distance from the viewport centre
 //   data-parallax-clamp="0.06"  optional limit, as a fraction of the frame height
 (function () {
     "use strict";
 
-    var query = window.matchMedia("(prefers-reduced-motion: no-preference) and (min-width: 1024px) and (pointer: fine)");
+    var query = window.matchMedia("(prefers-reduced-motion: no-preference)");
     var root = document.documentElement;
     var background = document.querySelector(".page-bg");
     var layers = Array.prototype.map.call(document.querySelectorAll("[data-parallax]"), function (el) {
