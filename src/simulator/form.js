@@ -6,6 +6,7 @@
     const byId = (id) => document.getElementById(id);
 
     const fields = {
+        form: byId("sim-form"),
         cep: byId("dest-cep"),
         venue: byId("event-venue"),
         address: byId("event-address"),
@@ -38,17 +39,18 @@
         fields.endDate.min = today;
     }
 
-    // Returns null when the dates are fine, or the error message to show.
+    // Returns null when the dates are fine, or { field, message } for the first problem.
     function dateError() {
         updateMinDates();
-
-        if (!datetime.isValidDateValue(fields.startDate.value) || !datetime.isValidDateValue(fields.endDate.value)) {
-            return "Informe datas válidas para o evento.";
-        }
-
         const today = fields.startDate.min;
-        if (fields.startDate.value < today || fields.endDate.value < today) {
-            return "Não é possível selecionar datas que já passaram.";
+
+        for (const field of [fields.startDate, fields.endDate]) {
+            if (!datetime.isValidDateValue(field.value)) {
+                return { field, message: "Informe datas válidas para o evento." };
+            }
+            if (field.value < today) {
+                return { field, message: "Não é possível selecionar datas que já passaram." };
+            }
         }
 
         return null;
@@ -68,8 +70,13 @@
         fields.cep.addEventListener("input", maskCepInput);
         fields.startTime.addEventListener("input", maskTimeInput);
         fields.endTime.addEventListener("input", maskTimeInput);
-        fields.calculate.addEventListener("click", handlers.onCalculate);
+        fields.form.addEventListener("submit", (event) => {
+            event.preventDefault(); // Enter in any field or the "Calcular" button
+            handlers.onCalculate();
+        });
         fields.manualToll.addEventListener("input", handlers.onManualToll);
+        // Typing in a field clears its error message.
+        fields.form.addEventListener("input", handlers.onEdit);
         updateMinDates();
     }
 

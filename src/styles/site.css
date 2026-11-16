@@ -25,7 +25,7 @@ html { scroll-padding-top: 5rem; }
   background: var(--accent);
   color: #111;
   font-weight: 700;
-  padding: 0.6rem 1rem;
+  padding: 0.7rem 1rem;
   border-radius: 0.5rem;
   text-decoration: none;
 }
@@ -56,6 +56,7 @@ html { scroll-padding-top: 5rem; }
 .brand {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 0.6rem;
   color: var(--text);
   text-decoration: none;
@@ -82,6 +83,9 @@ html { scroll-padding-top: 5rem; }
   font-size: 0.95rem;
   padding: 0.6rem 0.85rem;
   border-radius: 0.5rem;
+}
+@media (min-width: 1025px) and (max-width: 1240px) {
+  .site-nav a { padding: 0.6rem 0.55rem; font-size: 0.9rem; }
 }
 .site-nav a:hover { color: var(--accent); }
 .site-nav a[aria-current="page"] { color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
@@ -176,12 +180,15 @@ html { scroll-padding-top: 5rem; }
   color: var(--text-muted);
 }
 .breadcrumb li + li::before { content: "›"; margin-right: 0.4rem; color: var(--accent); }
+.breadcrumb ol { align-items: center; }
 .breadcrumb a {
   color: var(--accent);
   font-weight: 600;
   text-decoration: none;
-  display: inline-block;
-  padding: 0.25rem 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-right: 0.25rem;
 }
 .breadcrumb a:hover { text-decoration: underline; }
 
@@ -191,10 +198,16 @@ html { scroll-padding-top: 5rem; }
   margin-top: 0.5rem;
 }
 
-.sim-intro {
-  color: var(--text-muted);
-  margin-bottom: 1rem;
+/* Shorter top on phones so the form starts on the first screen. */
+@media (max-width: 640px) {
+  .sim-hero { padding: 1.25rem 1rem 1rem; }
+  .sim-hero .badge { margin-bottom: 0.5rem; }
+  .sim-hero h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
+  .sim-hero p { font-size: 0.9rem; }
+  .sim-main { margin-top: 1rem; }
 }
+body.sim-page { padding-bottom: 0; }
+body.confirm-in-view .wa-fab { opacity: 0; visibility: hidden; }
 
 button.btn-calc { position: relative; }
 button.btn-calc.is-loading { color: transparent; }
@@ -464,7 +477,28 @@ body.landing { padding-bottom: 0; }
 /* Scroll video section.
    Base (no JS / reduced motion): intro + a grid of videos with native controls.
    Enhanced (.js, no reduced motion): a sticky full-screen stage driven by video-scroll.js. */
-.video-scroll { padding: 4rem 0; }
+.video-scroll { padding: 4rem 0; --vs-count: 5; }
+.vs-intro__actions { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; justify-content: center; margin-top: 0.5rem; }
+.vs-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: 700 0.95rem var(--font-main);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.vs-link[hidden] { display: none; }
+/* Capas sem JS: sem JavaScript os vídeos não recebem a capa pelo script, então ela vem daqui. */
+html:not(.js) .vs-slide:nth-child(1) video { background: #000 url("/videos/paredao-iluminado-entardecer-poster.webp") center / cover; }
+html:not(.js) .vs-slide:nth-child(2) video { background: #000 url("/videos/paredao-leds-de-perto-poster.webp") center / cover; }
+html:not(.js) .vs-slide:nth-child(3) video { background: #000 url("/videos/dj-e-paredao-a-noite-poster.webp") center / cover; }
+html:not(.js) .vs-slide:nth-child(4) video { background: #000 url("/videos/festa-a-noite-luzes-poster.webp") center / cover; }
+html:not(.js) .vs-slide:nth-child(5) video { background: #000 url("/videos/publico-curtindo-a-festa-poster.webp") center / cover; }
 .vs-backdrops, .vs-hud, .vs-back { display: none; }
 .vs-list {
   list-style: none;
@@ -490,7 +524,8 @@ body.landing { padding-bottom: 0; }
 
 @media (prefers-reduced-motion: no-preference) {
   .js .video-scroll {
-    height: calc((var(--vs-count) + 1.9) * 100svh);
+    /* 0.9 screen to grow + 0.65 screen per video (STEP in video-scroll.js) + 1 screen of stage */
+    height: calc((var(--vs-count) * 0.65 + 1.9) * 100svh);
     padding: 0;
     background: #050608;
   }
@@ -601,7 +636,7 @@ body.landing { padding-bottom: 0; }
     box-shadow: 0 0 24px var(--accent-glow);
   }
   .vs-hud__full:hover { filter: brightness(1.1); }
-  .vs-hud__nav { display: flex; align-items: center; gap: 0.5rem; flex-basis: 100%; }
+  .vs-hud__nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; flex-basis: 100%; }
   .vs-hud__btn {
     width: 44px;
     height: 44px;
@@ -632,9 +667,10 @@ body.landing { padding-bottom: 0; }
     transition: scale 0.3s var(--ease), background-color 0.3s var(--ease);
   }
   .vs-hud__dot[aria-current="true"]::before { background: var(--accent); scale: 1.35; box-shadow: 0 0 10px var(--accent-glow); }
+  .vs-hud__toggle + .vs-hud__toggle { margin-left: 0; }
   .vs-hud__toggle {
     margin-left: auto;
-    min-height: 40px;
+    min-height: 44px;
     padding: 0.4rem 0.9rem;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.35);
@@ -760,7 +796,14 @@ body.landing { padding-bottom: 0; }
 }
 .site-footer ul { list-style: none; }
 .site-footer li { margin-bottom: 0.35rem; }
-.site-footer a { color: var(--text); text-underline-offset: 3px; }
+.site-footer a {
+  color: var(--text);
+  text-underline-offset: 3px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.site-footer li { margin-bottom: 0; }
 .site-footer a:hover { color: var(--accent); }
 .copyright {
   grid-column: 1 / -1;
@@ -819,6 +862,9 @@ body.menu-open .wa-fab { opacity: 0; visibility: hidden; }
     .js .site-nav.is-open li:nth-child(3) { transition-delay: 100ms; }
     .js .site-nav.is-open li:nth-child(4) { transition-delay: 150ms; }
     .js .site-nav.is-open li:nth-child(5) { transition-delay: 200ms; }
+    .js .site-nav.is-open li:nth-child(6) { transition-delay: 250ms; }
+    .js .site-nav.is-open li:nth-child(7) { transition-delay: 300ms; }
+    .js .site-nav.is-open li:nth-child(8) { transition-delay: 350ms; }
 
     body::after { transition: opacity 0.3s var(--ease), visibility 0s linear 0.3s; }
     body.menu-open::after { transition: opacity 0.3s var(--ease), visibility 0s; }
@@ -914,4 +960,4 @@ body.menu-open .wa-fab { opacity: 0; visibility: hidden; }
   }
 }
 
-.sim-main { margin-bottom: 6rem; }
+.sim-main { margin-bottom: 3rem; }

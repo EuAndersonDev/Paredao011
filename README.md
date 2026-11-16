@@ -9,7 +9,7 @@ Requer Node 20+.
 
 ```bash
 npm run dev      # build + servidor local em http://localhost:3000 (inclui /api/trip)
-npm test         # testes de preço, datas, WhatsApp e build
+npm test         # testes de preço, datas, WhatsApp, simulador, API e build
 npm run check    # testes + build (o mesmo que o CI roda)
 ```
 
@@ -19,19 +19,12 @@ Para o simulador calcular rotas localmente, crie `.env.local` (já ignorado pelo
 
 Tudo fica em **`src/config.js`**, no bloco marcado `EDIT PRICES HERE`: valor por hora, consumo do carro, gasolina, multiplicador de pedágio e sinal (%).
 Telefone do WhatsApp, Instagram, `SITE_URL` e dados de SEO (`BUSINESS`) estão no mesmo arquivo.
-Depois de editar um preço, rode:
-
-```bash
-npm run test:update   # regrava os valores de referência dos testes com os novos preços
-npm run check         # testes + build
-```
-
-Os testes de referência (`tests/fixtures/golden-quotes.json`) travam os totais de propósito: se um preço mudar sem `test:update`, o CI fica vermelho. Confira a diferença no commit antes de enviar.
+Depois de editar, rode `npm run check`. Os testes usam uma tabela de preços própria (`tests/fixtures/golden-quotes.json`), então **mudar preço não quebra o CI**; eles só falham se a conta ou o formato da mensagem do WhatsApp mudarem.
 
 ## Vercel
 
 - Variável de ambiente: **`GOOGLE_MAPS_API_KEY`** (Settings → Environment Variables). Fica só no servidor; não use prefixo público.
-- `vercel.json` já define o build (`npm run build` → `dist/`), URLs limpas, redirecionamento e cabeçalhos de segurança.
+- `vercel.json` já define o build (`npm run build` → `dist/`), URLs limpas, redirecionamento e cabeçalhos de segurança, incluindo a Content-Security-Policy. Se o script inline das páginas mudar, o teste avisa que o hash da CSP precisa ser atualizado.
 
 ## Estrutura
 

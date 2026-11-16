@@ -1,18 +1,18 @@
         <div class="card">
             <h2>Simulador de orçamento</h2>
-            <br>
             <div class="info-box">
                 O orçamento considera a duração do evento, o percurso de ida e volta e os pedágios.
             </div>
 
+            <form id="sim-form" novalidate>
             <div class="form-group">
                 <label for="event-venue">Nome do responsável</label>
-                <input type="text" id="event-venue" autocomplete="organization" minlength="2" maxlength="80" required>
+                <input type="text" id="event-venue" autocomplete="name" minlength="2" maxlength="80" required>
             </div>
 
             <div class="form-group">
                 <label for="event-address">Endereço do evento</label>
-                <input type="text" id="event-address" autocomplete="street-address" required>
+                <input type="text" id="event-address" autocomplete="off" required>
             </div>
 
             <div class="form-group">
@@ -32,12 +32,13 @@
             <div class="form-group">
                 <label for="dest-cep">CEP do Local do Evento</label>
                 <div class="input-row">
-                    <input type="text" id="dest-cep" placeholder="00000-000" maxlength="9" inputmode="numeric">
-                    <button class="btn-calc" id="btn-calcular" type="button">Calcular</button>
+                    <input type="text" id="dest-cep" placeholder="00000-000" maxlength="9" inputmode="numeric" autocomplete="postal-code" required>
+                    <button class="btn-calc" id="btn-calcular" type="submit">Calcular</button>
                 </div>
                 <p class="privacy-note">Seus dados não são armazenados; são usados apenas para montar a mensagem no WhatsApp.</p>
-                <div id="status" class="status-msg"></div>
+                <div id="status" class="status-msg" role="status" aria-live="polite"></div>
             </div>
+            </form>
 
             <div id="result" class="result-box">
                 <div class="result-grid">
@@ -54,16 +55,17 @@
                 <div id="manual-toll-group" class="form-group" hidden>
                     <label for="manual-toll">Pedágio estimado para o carro (ida e volta); o cálculo inclui a carretinha</label>
                     <input type="text" id="manual-toll" inputmode="decimal" placeholder="0,00" aria-describedby="manual-toll-status">
-                    <div id="manual-toll-status" class="status-msg"></div>
+                    <div id="manual-toll-status" class="status-msg" role="status" aria-live="polite"></div>
                 </div>
 
-                <div class="total-banner">
+                <div class="total-banner" role="status" aria-live="polite" aria-atomic="true">
                     <div class="tag">Valor Estimado Total</div>
                     <div class="price" id="res-total">-</div>
                 </div>
 
-                <a href="#" target="_blank" id="btn-whats" class="btn-whatsapp">
-          Confirmar Orçamento no WhatsApp
-        </a>
+                <!-- Sem href até existir um valor: o link só fica ativo quando o total é calculado. -->
+                <a id="btn-whats" class="btn-whatsapp" role="link" aria-disabled="true">
+                    Confirmar Orçamento no WhatsApp
+                </a>
             </div>
         </div>

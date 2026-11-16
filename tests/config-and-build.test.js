@@ -7,9 +7,9 @@ const { join } = require("node:path");
 const ROOT = join(__dirname, "..");
 const CONFIG = require("../src/config.js");
 
-test("config holds every price and is frozen", () => {
+test("production config: every price is a positive number and the file is frozen", () => {
     for (const key of ["HOURLY_RATE_BRL", "CAR_KM_PER_LITER", "GASOLINE_PRICE_BRL_PER_LITER", "TOLL_VEHICLE_MULTIPLIER", "RESERVATION_DEPOSIT_PERCENT"]) {
-        assert.equal(typeof CONFIG[key], "number", key);
+        assert.ok(Number.isFinite(CONFIG[key]) && CONFIG[key] > 0, `${key} must be a positive number`);
     }
     assert.ok(Object.isFrozen(CONFIG));
     assert.match(CONFIG.WHATSAPP_PHONE, /^55\d{10,11}$/);
@@ -46,4 +46,19 @@ test("every video, preview and poster referenced on the home page exists in the 
     const refs = [...html.matchAll(/(?:src|data-preview|data-poster)="(\/videos\/[^"]+)"/g)].map((m) => m[1]);
     assert.ok(refs.length >= 15, `expected full + preview + poster per video, found ${refs.length}`);
     for (const ref of refs) assert.ok(existsSync(join(ROOT, "dist", ref)), ref);
+});
+
+test("Content-Security-Policy allows exactly the inline script that is in the pages", () => {
+    const { createHash } = require("node:crypto");
+    const vercel = JSON.parse(readFileSync(join(ROOT, "vercel.json"), "utf8"));
+    const csp = vercel.headers[0].headers.find((h) => h.key === "Content-Security-Policy").value;
+    for (const page of ["index.html", "orcamento.html"]) {
+        const html = readFileSync(join(ROOT, "dist", page), "utf8");
+        const inline = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+        assert.equal(inline.length, 1, `${page}: exactly one inline script`);
+        const hash = createHash("sha256").update(inline[0]).digest("base64");
+        assert.ok(csp.includes(`'sha256-${hash}'`), `${page}: inline script hash is in the CSP`);
+        assert.doesNotMatch(html, / style="/, `${page}: no inline style attributes (blocked by style-src)`);
+    }
+    assert.doesNotMatch(csp, /unsafe-inline|unsafe-eval/);
 });

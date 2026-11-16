@@ -177,13 +177,17 @@
 
         <!-- 4b. Vídeos: ao rolar, o vídeo cresce até ocupar a tela; cada passo de rolagem mostra a prévia de 5 s do próximo vídeo;
              "Ver vídeo completo" toca o vídeo inteiro com som (components/video-scroll.js). Sem JS ou com movimento reduzido: lista simples.
-             Novos vídeos: coloque em assets-src/videos/, rode scripts/optimize-videos.sh, copie um <li> e ajuste --vs-count. -->
-        <section class="video-scroll" id="videos" data-video-scroll style="--vs-count: 5" aria-labelledby="videos-title">
+             Novos vídeos: coloque em assets-src/videos/, rode scripts/optimize-videos.sh, copie um <li> e adicione a capa em site.css (regra "capas sem JS"). -->
+        <section class="video-scroll" id="videos" data-video-scroll aria-labelledby="videos-title">
             <div class="vs-sticky">
                 <div class="vs-intro container">
                     <span class="eyebrow">Vídeos</span>
                     <h2 id="videos-title">Veja e ouça o paredão de som</h2>
                     <p class="section-lead">Role a página para ver as prévias. Toque em “Ver vídeo completo” para assistir inteiro, com som.</p>
+                    <p class="vs-intro__actions">
+                        <button class="vs-link" type="button" data-start hidden>Assistir aos vídeos</button>
+                        <a class="vs-link" href="#regioes">Pular os vídeos</a>
+                    </p>
                 </div>
                 <div class="vs-backdrops" aria-hidden="true">
                     <div class="vs-backdrop"></div>
@@ -254,6 +258,7 @@
                             <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
                         </button>
                         <button class="vs-hud__toggle" type="button" data-toggle aria-pressed="false">Pausar prévias</button>
+                        <button class="vs-hud__toggle" type="button" data-skip>Pular vídeos</button>
                     </div>
                 </div>
                 <button class="vs-back" type="button" data-back hidden>

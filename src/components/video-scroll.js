@@ -98,8 +98,13 @@
         return item;
     });
 
+    // One "step" of scrolling per video, as a share of the screen height (keep in sync with the CSS).
+    var STEP = 0.65;
+    root.style.setProperty("--vs-count", String(total));
     root.classList.add("is-enhanced");
     hud.hidden = false;
+    var startButton = root.querySelector("[data-start]");
+    startButton.hidden = false;
 
     function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
     function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
@@ -208,7 +213,8 @@
             mediaW: mediaW,
             startScale: cardH / mediaH,
             startY: introBottom + 12,
-            expand: vh * 0.9
+            expand: vh * 0.9,
+            step: vh * STEP
         };
         media.style.width = mediaW + "px";
         media.style.height = mediaH + "px";
@@ -217,7 +223,7 @@
 
     function segmentTop(i) {
         var top = window.scrollY + root.getBoundingClientRect().top;
-        return top + geo.expand + i * geo.vh + 2;
+        return top + geo.expand + i * geo.step + 2;
     }
 
     function scrollToSlide(i, announce) {
@@ -226,8 +232,9 @@
     }
 
     function scrollPastSection() {
-        var rect = root.getBoundingClientRect();
-        window.scrollTo({ top: window.scrollY + rect.bottom - geo.vh * 0.5, behavior: "smooth" });
+        var next = root.nextElementSibling;
+        var target = next ? next.getBoundingClientRect().top : root.getBoundingClientRect().bottom;
+        window.scrollTo({ top: window.scrollY + target - 60, behavior: "smooth" });
     }
 
     // ---------- per-frame update ----------
@@ -249,7 +256,7 @@
         var hudOn = hudVisible > 0.5;
         if (hud.inert === hudOn) hud.inert = !hudOn;
 
-        var i = scrolled < geo.expand ? 0 : Math.floor((scrolled - geo.expand) / geo.vh);
+        var i = scrolled < geo.expand ? 0 : Math.floor((scrolled - geo.expand) / geo.step);
         activate(clamp(i, 0, total - 1), false);
 
         var visible = rect.bottom > 0 && rect.top < geo.vh;
@@ -282,6 +289,19 @@
     root.querySelector("[data-next]").addEventListener("click", function () {
         if (index < total - 1) scrollToSlide(index + 1, true);
         else scrollPastSection();
+    });
+    root.querySelector("[data-skip]").addEventListener("click", scrollPastSection);
+    // Keyboard and screen-reader entry point: jumps to the first video and puts focus on its controls.
+    startButton.addEventListener("click", function () {
+        scrollToSlide(0, true);
+        var tries = 0;
+        var waitForHud = setInterval(function () {
+            tries += 1;
+            if (!hud.inert || tries > 40) {
+                clearInterval(waitForHud);
+                fullButton.focus({ preventScroll: true });
+            }
+        }, 80);
     });
     toggle.addEventListener("click", function () {
         autoplay = !autoplay;

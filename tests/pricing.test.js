@@ -1,14 +1,16 @@
-// Characterization tests: the refactored pure functions must reproduce, to the cent and to the
-// character, what the original simulator UI produced (tests/fixtures/golden-quotes.json).
+// Characterization tests: the pure functions must reproduce, to the cent and to the character,
+// what the original simulator UI produced (tests/fixtures/golden-quotes.json).
+// They run with the fixed price table stored in the fixture, NOT with src/config.js, so a
+// price change in production never breaks CI; only a change in the calculation does.
 const test = require("node:test");
 const assert = require("node:assert/strict");
 
-const CONFIG = require("../src/config.js");
 const format = require("../src/lib/format.js");
 const datetime = require("../src/lib/datetime.js");
 const pricing = require("../src/lib/pricing.js");
 const whatsapp = require("../src/lib/whatsapp.js");
 const golden = require("./fixtures/golden-quotes.json");
+const CONFIG = Object.freeze(golden.config);
 
 // Mirrors the simulator flow (src/simulator/simulator.js) without the DOM.
 function quoteFor(scenario) {
@@ -27,10 +29,6 @@ function quoteFor(scenario) {
 }
 
 for (const scenario of golden.scenarios) {
-    // Typing the manual toll key by key hits a known UI bug (docs/AUDIT.md); the pure
-    // functions are only checked for the pasted ("fill") case.
-    if (scenario.manualTollEntry === "type") continue;
-
     test(`golden: ${scenario.id}`, () => {
         const result = quoteFor(scenario);
         if (scenario.expected.whatsappHref === null) {
