@@ -36,7 +36,9 @@ for (const s of golden.scenarios) {
   s.expected.whatsappHref = whatsapp.buildLink(CONFIG.WHATSAPP_PHONE, lines);
 }
 
-golden._about = `Locks the simulator output for HOURLY_RATE_BRL=${CONFIG.HOURLY_RATE_BRL}. Originally recorded from the real UI; after an intentional price change regenerate with "npm run test:update" and review the diff.`;
+const prices = ["HOURLY_RATE_BRL", "CAR_KM_PER_LITER", "GASOLINE_PRICE_BRL_PER_LITER", "TOLL_VEHICLE_MULTIPLIER", "RESERVATION_DEPOSIT_PERCENT"]
+  .map((key) => `${key}=${CONFIG[key]}`).join(", ");
+golden._about = `Locks the simulator output for ${prices}. Originally recorded from the real UI; after an intentional price change regenerate with "npm run test:update" and review the diff.`;
 writeFileSync(file, JSON.stringify(golden, null, 2) + "\n");
-console.log(`Updated ${golden.scenarios.length} scenarios for HOURLY_RATE_BRL=${CONFIG.HOURLY_RATE_BRL}.`);
+console.log(`Updated ${golden.scenarios.length} scenarios for ${prices}.`);
 for (const s of golden.scenarios) console.log(`  ${s.id.padEnd(16)} ${s.expected.total}`);
