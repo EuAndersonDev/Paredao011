@@ -53,13 +53,13 @@
         quote.totalBRL = price.totalBRL;
     }
 
-    // Known issue (kept as-is, see docs/AUDIT.md): after the first valid value the quote
-    // switches to "manual" and later edits of the field are ignored.
+    // Runs on every edit of the manual toll field, so the total always matches what is typed.
     function onManualToll() {
-        if (!currentQuote || currentQuote.tollsStatus !== "unknown") return;
+        if (!currentQuote || !currentQuote.needsManualToll) return;
 
         const manualTollInputBRL = P.format.parseMoneyInput(form.fields.manualToll.value);
         if (manualTollInputBRL === null) {
+            currentQuote.tollsBRL = null;
             view.clearTotal();
             view.setManualTollStatus("Informe um valor válido de pedágios em reais para calcular o total.", true);
             return;
@@ -68,13 +68,14 @@
         view.setManualTollStatus("", false);
         const manualToll = P.pricing.manualTollsBRL(manualTollInputBRL, CONFIG);
         currentQuote.tollsBRL = manualToll;
-        currentQuote.tollsStatus = "manual";
         showPrice(currentQuote, manualToll);
     }
 
-    function fail(message) {
+    // Validation error: message under the field, focus on it, result hidden.
+    function fail(field, message) {
         view.hideResult();
-        view.showStatus(message, "error");
+        view.showStatus("", "");
+        view.showFieldError(field, message);
     }
 
     function isValidTrip(data) {
@@ -94,25 +95,33 @@
     async function onCalculate() {
         if (requestInFlight || cooldownInterval !== null) return;
 
-        const dateError = form.dateError();
-        if (dateError) return fail(dateError);
-
+        // Checked in the order the fields appear on the page.
+        const f = form.fields;
         const { cleanCep, venueName, eventAddress, start, end } = form.read();
+        view.clearFieldError();
 
-        if (start === null || end === null) {
-            return fail("Use o formato 24h, ex.: 21:30, e informe datas e horários válidos.");
-        }
-        if (end.timestamp <= start.timestamp) {
-            return fail("O fim do evento deve ser posterior ao início.");
-        }
-        if (cleanCep.length !== 8) {
-            return fail("Digite um CEP válido com 8 dígitos.");
-        }
-        if (!venueName || !eventAddress) {
-            return fail("Informe o nome do local e o endereço completo do evento.");
+        if (!venueName) {
+            return fail(f.venue, "Informe o nome do responsável.");
         }
         if (venueName.length < 2 || venueName.length > 80) {
-            return fail("O nome do responsável deve ter entre 2 e 80 caracteres.");
+            return fail(f.venue, "O nome do responsável deve ter entre 2 e 80 caracteres.");
+        }
+        if (!eventAddress) {
+            return fail(f.address, "Informe o endereço completo do evento.");
+        }
+        const dateError = form.dateError();
+        if (dateError) return fail(dateError.field, dateError.message);
+        if (start === null) {
+            return fail(f.startTime, "Use o formato 24h, ex.: 21:30, e informe datas e horários válidos.");
+        }
+        if (end === null) {
+            return fail(f.endTime, "Use o formato 24h, ex.: 21:30, e informe datas e horários válidos.");
+        }
+        if (end.timestamp <= start.timestamp) {
+            return fail(f.endTime, "O fim do evento deve ser posterior ao início.");
+        }
+        if (cleanCep.length !== 8) {
+            return fail(f.cep, "Digite um CEP válido com 8 dígitos.");
         }
 
         button.disabled = true;
@@ -175,16 +184,17 @@
                 outboundKm: data.outboundKm,
                 returnKm: data.returnKm,
                 tollsBRL,
-                tollsStatus: data.tollsStatus,
+                needsManualToll: data.tollsStatus === "unknown",
                 start,
                 end
             };
 
-            view.showResult(cleanCep, `${P.format.hours(hours)} horas`);
+            view.showResult(`${cleanCep.slice(0, 5)}-${cleanCep.slice(5)}`, `${P.format.hours(hours)} horas`);
+            view.showStatus("", ""); // done: the "consultando" message goes away
 
             if (data.tollsStatus === "unknown") {
                 view.askManualToll("Informe o valor de pedágios em reais para calcular o total.");
-                view.showStatus("", "");
+                form.fields.manualToll.focus();
             } else {
                 showPrice(currentQuote, tollsBRL);
             }
@@ -196,5 +206,5 @@
         }
     }
 
-    form.init({ onCalculate, onManualToll });
+    form.init({ onCalculate, onManualToll, onEdit: view.clearFieldError });
 })(typeof globalThis !== "undefined" ? globalThis : this);

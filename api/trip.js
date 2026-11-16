@@ -214,6 +214,11 @@ module.exports = async function handler(request, response) {
     try {
       const destinationAddress = await buscarEndereco(cep, controller.signal);
       if (!destinationAddress) {
+        // Same size limit as the result cache, so the list cannot grow without bound.
+        if (negativeCache.size >= CONFIG.CACHE_MAX_ENTRIES) {
+          const oldestCep = negativeCache.keys().next().value;
+          if (oldestCep !== undefined) negativeCache.delete(oldestCep);
+        }
         negativeCache.set(cep, Date.now() + CONFIG.NEGATIVE_TTL_MS);
         return { status: 404, body: { error: "CEP_NOT_FOUND" } };
       }

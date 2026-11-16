@@ -120,7 +120,7 @@ h1 span {
 
 .card h2 {
   font-size: 1.35rem;
-  margin-bottom: 0.3rem;
+  margin-bottom: 1rem;
 }
 
 .info-box {
@@ -145,9 +145,18 @@ label {
   color: #ffffff;
 }
 
+input + label {
+  margin-top: 0.75rem;
+}
+
 .input-row {
   display: flex;
   gap: 0.5rem;
+}
+
+input,
+button {
+  font-family: inherit;
 }
 
 input {
@@ -164,6 +173,16 @@ input {
 
 input:focus {
   border-color: var(--accent);
+}
+
+input[aria-invalid="true"] {
+  border-color: #ff8585;
+}
+
+.field-error {
+  color: #ff8585;
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
 }
 
 button.btn-calc {
@@ -266,6 +285,11 @@ button.btn-calc:disabled {
   padding: 1rem;
   border-radius: 0.6rem;
   font-size: 1rem;
+}
+
+.btn-whatsapp[aria-disabled="true"] {
+  filter: grayscale(1) brightness(0.55);
+  cursor: not-allowed;
 }
 
 .btn-whatsapp:hover {

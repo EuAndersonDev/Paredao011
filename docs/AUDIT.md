@@ -1,54 +1,64 @@
-# Auditoria de segurança e arquitetura — Paredão 011
+# Auditoria de segurança, código e UX — Paredão 011
 
-Data: 2026-11-11 · Escopo: repositório completo, histórico do git e saída do build (`dist/`).
+Última revisão: 2026-11-16 · Escopo: repositório, histórico do git, build (`dist/`) e site no ar.
 
 ## Stack e chamadas externas
 
-HTML/CSS/JS puro, sem dependências npm. Um build em Node (`scripts/build.mjs`) gera `dist/`, publicado pela Vercel, mais uma Vercel Function (`api/trip.js`).
+HTML/CSS/JS puro, sem dependências npm. `scripts/build.mjs` gera `dist/`, publicado pela Vercel, mais uma Vercel Function (`api/trip.js`).
 
 | Chamada | Onde roda | Chave? |
 |---|---|---|
 | `POST /api/trip` (mesma origem) | navegador → Vercel Function | não |
-| `https://viacep.com.br/ws/{cep}/json/` (`api/trip.js:24`) | Vercel Function | não |
-| `https://routes.googleapis.com/directions/v2:computeRoutes` (`api/trip.js:64`) | Vercel Function | `GOOGLE_MAPS_API_KEY` no cabeçalho `X-Goog-Api-Key` |
-| `https://wa.me/...` | link aberto pelo usuário (sem fetch) | não |
-| `https://www.instagram.com/paredao_011/` | link | não |
+| `https://viacep.com.br/ws/{cep}/json/` | Vercel Function | não |
+| `https://routes.googleapis.com/directions/v2:computeRoutes` | Vercel Function | `GOOGLE_MAPS_API_KEY` no cabeçalho `X-Goog-Api-Key` |
+| `https://wa.me/...`, Instagram | links abertos pelo usuário | não |
 
-As fontes são servidas pelo próprio site, sem chamadas ao Google Fonts.
+Fontes, imagens e vídeos são servidos pelo próprio site.
 
 ## Chave de API
 
-- `GOOGLE_MAPS_API_KEY` só é lida em `api/trip.js:205` (`process.env`, sem prefixo público). O navegador nunca a recebe: a função devolve apenas `outboundKm`, `returnKm`, `tollsBRL` e `tollsStatus`.
-- Busca por padrões de chave (`AIza…`, `api_key=`, `secret`, `token`) em **todo o histórico do git**: nada encontrado. Nenhum arquivo `.env*` foi commitado (`.env*` está no `.gitignore`).
-- Busca por padrões de chave em `dist/`: nada encontrado. Um teste (`tests/config-and-build.test.js`) agora falha o build se `process.env`, `GOOGLE_MAPS_API_KEY` ou uma chave `AIza…` aparecer no bundle do navegador.
-- **Status: NÃO exposta.** A forma como a chave chega ao código não foi alterada.
+- `GOOGLE_MAPS_API_KEY` só é lida em `api/trip.js` (`process.env`, sem prefixo público). A função devolve apenas `outboundKm`, `returnKm`, `tollsBRL` e `tollsStatus`.
+- Nenhuma chave ou arquivo `.env*` no histórico do git; nenhum padrão de chave em `dist/`. Os testes falham se `process.env` ou uma chave aparecer no bundle do navegador, ou se a chave for parar numa URL.
+- **Status: NÃO exposta.**
 
-## Achados
+## Verificado no site no ar
 
-| Severidade | Arquivo:linha | Problema | Correção |
-|---|---|---|---|
-| Média | `api/trip.js:133` | `/api/trip` é público e sem limite de uso: alguém pode chamar a função em massa e gerar custo na API de rotas do Google. Os caches em memória ajudam, mas não impedem. | Ação do dono: restringir a chave no Google Cloud (só a Routes API) e criar cota diária e alerta de cobrança. Se houver abuso, ativar uma regra de rate limit no Firewall da Vercel (configuração, não código). |
-| Média (bug, **não corrigido**) | `src/simulator/simulator.js:59,71` | Pedágio manual: o primeiro valor válido digitado trava o cálculo e as edições seguintes são ignoradas. Digitar `12,50` tecla por tecla gera R$ 873,17; colar `12,50` gera R$ 896,17. **O cliente pode receber um valor menor que o correto.** | Aguardando aprovação: permitir recalcular enquanto o status for `unknown` ou `manual`. Comportamento original mantido e registrado nos testes. |
-| Baixa (bug, **não corrigido**) | `src/simulator/simulator.js:123,189` | Depois de um cálculo com sucesso, a mensagem "Consultando o CEP e calculando a rota..." continua na tela. | Limpar o status ao mostrar o total. Mantido igual ao original. |
-| Baixa | `src/simulator/simulator.js:114` | O nome do responsável só era checado como "não vazio". | **Corrigido:** agora exige 2–80 caracteres (`maxlength="80"` no campo). |
-| Baixa | `vercel.json` | Faltavam `X-Frame-Options`, `Strict-Transport-Security` e `Permissions-Policy`. | **Corrigido:** cabeçalhos adicionados. |
-| Info | `src/simulator/simulator.js:112` | A mensagem de erro fala em "nome do local", mas o campo é "Nome do responsável". | Ajuste de texto pendente de aprovação (não alterado). |
-| Info | `src/lib/whatsapp.js:18` | Eventos de vários dias mostram só a data de início na mensagem do WhatsApp. | Decisão de negócio; não alterado. |
-| Info | — | Não há Content-Security-Policy. | Sugestão para a próxima versão: `default-src 'self'; img-src 'self' data:; script-src 'self' 'sha256-…'` (hash do script inline que adiciona a classe `js`); `style-src 'self'`; `frame-ancestors 'none'`. |
+- `/api/trip` rejeita método errado (405), tipo de conteúdo errado (415), corpo grande (413) e CEP malformado (400).
+- `/src`, `/tests`, `/docs`, `/.env`, `/.git`, `/package.json` e `/vercel.json` respondem 404.
+- Cabeçalhos: `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Strict-Transport-Security`, `Permissions-Policy`.
 
-Também verificado, sem problemas:
-- Nenhum `innerHTML`, `insertAdjacentHTML` ou `document.write`. Dados do usuário e da API entram na página só via `textContent`.
-- A mensagem do WhatsApp é codificada linha a linha com `encodeURIComponent` (`src/lib/whatsapp.js`).
-- `npm audit`: 0 vulnerabilidades (o projeto não tem dependências).
-- Nenhum dado é armazenado: o CEP vai para `/api/trip`, que guarda em memória só o resultado da rota por CEP, por até 6 h, sem nome nem endereço.
+## Corrigido nesta revisão
 
-## Código morto e duplicado removido
+| Área | Problema | Correção |
+|---|---|---|
+| Preço | Pedágio manual digitado tecla por tecla usava só o primeiro dígito. | Recalcula a cada edição; coberto por teste. |
+| Simulador | Botão "Confirmar Orçamento no WhatsApp" clicável sem valor (abria a própria página). | Sem `href` e `aria-disabled` até existir um total. |
+| Simulador | "Consultando o CEP..." ficava na tela depois do cálculo. | Mensagem limpa ao terminar. |
+| Simulador | Erros apareciam um por vez, longe do campo, sem destaque nem anúncio. | Erro sob o campo, foco no campo, `aria-invalid`, `role="alert"`; validação de cima para baixo; mensagens separadas para nome e endereço. |
+| Simulador | Enter não calculava; campos e botão em Arial; CEP sem traço; botão flutuante cobria o botão de confirmar; sem rodapé; topo longo no celular. | Formulário de verdade, fonte do site, `01001-000`, flutuante some perto do botão, rodapé incluído, topo encurtado. |
+| Acessibilidade | Resultado e mensagens não eram anunciados. | `aria-live` no status, no total e no pedágio manual. |
+| Vídeos | Seção com 6,9 telas de rolagem, sem como pular e inalcançável por teclado. | 5,15 telas, "Pular os vídeos" e "Assistir aos vídeos" (leva o foco aos controles). |
+| Página inicial | Menu sem Galeria, Vídeos e Dúvidas; links do rodapé pequenos para toque; vídeos sem capa sem JavaScript. | Links adicionados; áreas de toque de 44 px; capas via CSS sem JS. |
+| HTML | `autocomplete` inválido em dois campos; link sem `rel="noopener"`. | Corrigidos; `html-validate` sem erros. |
+| Segurança | Lista de CEPs não encontrados crescia sem limite. | Limitada a 200 entradas, como o cache de resultados. |
+| Segurança | Sem Content-Security-Policy. | CSP em `vercel.json` (sem `unsafe-inline`); teste confere o hash do script inline. |
+| CI | Workflow sem permissões mínimas. | `permissions: contents: read`. |
+| Testes | Usavam os preços de produção: toda mudança de preço quebrava o CI. | Tabela de preços fixa nos testes. |
+| Testes | Sem cobertura da função da API e do fluxo do simulador. | `tests/api-trip.test.js` e `tests/simulator.test.js`. |
 
-- `EXTRA_HOUR_RATE_BRL` (config): nunca era usado.
-- Linha duplicada `if (data.tollsStatus === "unknown") showStatus("", "")` (antigo `app.js:415-416`).
-- `ORIGIN_CEP` e `TOLL_VEHICLE_MULTIPLIER` duplicados em `api/trip.js`: agora vêm de `src/config.js`.
-- `site.config.json`: incorporado a `src/config.js` (arquivo único).
-- Telefone e Instagram repetidos no HTML e no `llms.txt`: agora vêm do config no build.
-- Código que reescrevia os links do WhatsApp em JS: o build já gera o link certo.
-- CSS sem uso: `.card .subtitle` e `.grid--2`.
-- Header e botão do WhatsApp duplicados nas duas páginas: agora são componentes (`src/components/`).
+## Pendências do dono (não são código)
+
+| Gravidade | Item | Como resolver |
+|---|---|---|
+| Média | `/api/trip` é público e sem limite de uso: chamadas em massa geram custo no Google. | Google Cloud: restringir a chave à Routes API, criar cota diária e alerta de cobrança. Se houver abuso, regra de rate limit no Firewall da Vercel. |
+| Média | `main` sem proteção; a Vercel publica mesmo com o CI vermelho. | GitHub → Settings → Branches: exigir o check "CI" no `main`. |
+| Baixa | GitHub Pages publica uma cópia do repositório. | Settings → Pages → Source: None. |
+| Baixa | "Regiões atendidas" mostra só "Grande São Paulo". | Preencher `BUSINESS.cities` em `src/config.js`. |
+| Info | Placa do caminhão e rostos aparecem nos vídeos. | Confirmar autorização de quem aparece. |
+| Info | Eventos de vários dias mostram só a data de início na mensagem do WhatsApp. | Decisão de negócio. |
+
+## Observações
+
+- A CSP bloqueia scripts de terceiros. Em deploys de **preview** da Vercel, a barra de comentários da Vercel pode ser bloqueada e gerar avisos no console; em produção isso não ocorre. Se um dia for adicionado analytics ou outro serviço externo, ele precisa entrar na CSP.
+- As seções animam ao rolar para baixo e para cima, a pedido. Se ficar cansativo no uso real, basta voltar a animar uma vez só em `src/components/scroll-reveal.js`.
+- Não há linter/formatador automático; opcional para um projeto deste tamanho.

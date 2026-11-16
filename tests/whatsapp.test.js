@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const CONFIG = require("../src/config.js");
+const CONFIG = { WHATSAPP_PHONE: "5511900000000", RESERVATION_DEPOSIT_PERCENT: 40 }; // fixed test values
 const format = require("../src/lib/format.js");
 const whatsapp = require("../src/lib/whatsapp.js");
 

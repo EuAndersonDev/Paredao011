@@ -1,5 +1,5 @@
-// Visual effects for the simulator. Read-only with respect to app.js: it only observes the DOM
-// that app.js updates (status message and total) and never changes inputs, values or links.
+// Visual effects for the simulator. It only observes the DOM that simulator.js updates
+// (status message, total, result) and never changes inputs, values or links.
 (function () {
     "use strict";
 
@@ -8,8 +8,8 @@
     var total = document.getElementById("res-total");
     if (!button || !status || !total) return;
 
-    // Loading state on "Calcular": app.js disables the button and shows a "loading" status
-    // while the request runs (the status text itself is not cleared after success).
+    // Loading state on "Calcular": simulator.js disables the button and shows a "loading"
+    // status while the request runs.
     var syncLoading = function () {
         var loading = button.disabled && status.classList.contains("loading");
         button.classList.toggle("is-loading", loading);
@@ -20,9 +20,17 @@
     loadingObserver.observe(status, { attributes: true, attributeFilter: ["class"] });
     loadingObserver.observe(button, { attributes: true, attributeFilter: ["disabled"] });
 
+    // The floating WhatsApp button steps aside while the "Confirmar Orçamento" button is on screen.
+    var confirmButton = document.getElementById("btn-whats");
+    if (confirmButton && "IntersectionObserver" in window) {
+        new IntersectionObserver(function (entries) {
+            document.body.classList.toggle("confirm-in-view", entries[0].isIntersecting);
+        }, { rootMargin: "0px 0px 80px 0px" }).observe(confirmButton);
+    }
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    // Count-up: an aria-hidden overlay animates to the value app.js wrote into #res-total.
+    // Count-up: an aria-hidden overlay animates to the value simulator.js wrote into #res-total.
     // The real element always holds the final text, so results and screen readers are unaffected.
     var formatter = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
     var overlay = null;

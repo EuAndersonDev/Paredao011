@@ -37,7 +37,7 @@
     <!-- @jsonld -->
 </head>
 
-<body>
+<body class="sim-page">
 
     <a class="skip-link" href="#conteudo">Pular para o simulador</a>
     <!-- @include components/header.html -->
@@ -45,7 +45,7 @@
     <div class="sim-hero">
         <div class="badge">orçamentos</div>
         <h1>@PAREDÃO_<span>011</span></h1>
-        <p>Simulador de orçamento para aluguel de paredão de som: locação de estrutura completa de som automotivo para festas e eventos na Grande SP.</p>
+        <p>Simulador de orçamento de aluguel de paredão de som para festas e eventos na Grande SP. Preencha os dados e confirme pelo WhatsApp.</p>
     </div>
 
     <main id="conteudo" class="sim-main">
@@ -55,9 +55,10 @@
                 <li aria-current="page">Simulador de orçamento</li>
             </ol>
         </nav>
-        <p class="sim-intro">Preencha os dados do evento para ver o valor estimado e confirmar o orçamento direto no WhatsApp.</p>
         <!-- @include simulator/form.html -->
     </main>
+
+    <!-- @include components/footer.html -->
 
     <!-- @include components/whatsapp-button.html -->
 </body>
