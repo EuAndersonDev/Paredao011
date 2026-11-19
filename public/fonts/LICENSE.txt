@@ -1,5 +1,8 @@
-Plus Jakarta Sans — Copyright 2020 The Plus Jakarta Sans Project Authors
-Space Grotesk — Copyright 2020 The Space Grotesk Project Authors
+Archivo — Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)
+IBM Plex Mono — Copyright © 2017 IBM Corp. with Reserved Font Name "Plex"
 
 Both fonts are licensed under the SIL Open Font License, Version 1.1:
 https://openfontlicense.org
+
+The files here are subsets (Latin + Portuguese characters). Archivo is limited to
+weights 400–900 and widths 62–100 to keep the file small.

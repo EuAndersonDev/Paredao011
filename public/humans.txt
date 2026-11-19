@@ -7,4 +7,4 @@ Location: Grande São Paulo, Brasil
 Last update: __BUILD_DATE__
 Language: Português (pt-BR)
 Standards: HTML5, CSS3, JavaScript
-Fonts: Plus Jakarta Sans, Space Grotesk (SIL OFL 1.1)
+Fonts: Archivo, IBM Plex Mono (SIL OFL 1.1)

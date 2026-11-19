@@ -27,7 +27,10 @@ def resize_w(im, width):
 
 def backgrounds():
     # The page darkens this image with a 64-78% overlay, so heavy compression is invisible.
-    bg = Image.open(SRC / "background.jpg")
+    # Desaturated and contrasted here, once, so the browser never runs a CSS filter on the
+    # fixed full-screen layer (that was costly while it animates).
+    bg = Image.open(SRC / "background.jpg").convert("RGB")
+    bg = ImageEnhance.Contrast(ImageEnhance.Color(bg).enhance(0.15)).enhance(1.15)
     for w in (800, 1600):
         save_all(resize_w(bg, w), OUT / f"bg-{w}", q_avif=35, q_webp=45, q_jpg=50)
 
@@ -77,9 +80,25 @@ def gallery():
             save_all(resize_w(im, w), dest / f"{path.stem}-{w}", q_avif=50, q_webp=72, q_jpg=78)
 
 
+def hero():
+    """Wide crop of the LED-panel photo for the hero on phones (the desktop hero uses the
+    4:5 gallery file). A dedicated crop avoids downloading pixels that are never shown."""
+    path = SRC / "gallery" / "paredao-painel-led.jpg"
+    if not path.exists():
+        return
+    im = ImageOps.exif_transpose(Image.open(path)).convert("RGB")
+    im = ImageOps.fit(im, (1080, 608), Image.LANCZOS, centering=(0.5, 0.36))
+    im = ImageEnhance.Contrast(im).enhance(1.06)
+    im = ImageEnhance.Color(im).enhance(1.05)
+    im = ImageEnhance.Sharpness(im).enhance(1.15)
+    for w in (720, 1080):
+        save_all(resize_w(im, w), PUBLIC / "img" / f"hero-led-{w}", q_avif=50, q_webp=72, q_jpg=78)
+
+
 if __name__ == "__main__":
     OUT.mkdir(exist_ok=True)
     backgrounds()
     logo()
     gallery()
+    hero()
     print("ok")

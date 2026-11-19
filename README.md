@@ -21,6 +21,14 @@ Tudo fica em **`src/config.js`**, no bloco marcado `EDIT PRICES HERE`: valor por
 Telefone do WhatsApp, Instagram, `SITE_URL` e dados de SEO (`BUSINESS`) estão no mesmo arquivo.
 Depois de editar, rode `npm run check`. Os testes usam uma tabela de preços própria (`tests/fixtures/golden-quotes.json`), então **mudar preço não quebra o CI**; eles só falham se a conta ou o formato da mensagem do WhatsApp mudarem.
 
+## Visual ("cartaz de baile + placa de caminhão")
+
+- Cores (em `src/styles/base.css`): `--ink` preto, `--paper` papel jornal, `--hazard` amarelo do caminhão, `--hot` só para erros.
+- Fontes próprias em `public/fonts/`: Archivo (títulos ultra-condensados, `font-stretch: 62%`) e IBM Plex Mono (etiquetas e o cupom do orçamento).
+- Fundo das seções: `section--paper` (papel), `section--ink` (preto) ou `section--hazard` (amarelo). A faixa listrada entre seções é automática.
+- Ação principal: classe `sticker`; secundária: `link-line`. Sem cantos arredondados, sem brilho: bordas grossas e sombra dura.
+- Animações: todas em `src/styles/site.css`, dentro de `prefers-reduced-motion: no-preference`.
+
 ## Vercel
 
 - Variável de ambiente: **`GOOGLE_MAPS_API_KEY`** (Settings → Environment Variables). Fica só no servidor; não use prefixo público.
