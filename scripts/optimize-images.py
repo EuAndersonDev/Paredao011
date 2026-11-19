@@ -27,7 +27,10 @@ def resize_w(im, width):
 
 def backgrounds():
     # The page darkens this image with a 64-78% overlay, so heavy compression is invisible.
-    bg = Image.open(SRC / "background.jpg")
+    # Desaturated and contrasted here, once, so the browser never runs a CSS filter on the
+    # fixed full-screen layer (that was costly while it animates).
+    bg = Image.open(SRC / "background.jpg").convert("RGB")
+    bg = ImageEnhance.Contrast(ImageEnhance.Color(bg).enhance(0.15)).enhance(1.15)
     for w in (800, 1600):
         save_all(resize_w(bg, w), OUT / f"bg-{w}", q_avif=35, q_webp=45, q_jpg=50)
 

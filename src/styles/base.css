@@ -1,297 +1,319 @@
+/* Paredão 011 — base: fonts, palette, page background and the simulator.
+   Visual direction: "cartaz de baile + placa de caminhão". Colours come from the truck
+   itself (hazard yellow, ink black, paper white), type from street posters (ultra-condensed
+   Archivo), and the quote is printed like a receipt (IBM Plex Mono). No glows, no pills,
+   no soft rounded cards: hard edges, thick rules and offset shadows. */
+
 @font-face {
-  font-family: 'Plus Jakarta Sans';
+  font-family: "Archivo";
   font-style: normal;
-  font-weight: 200 800;
+  font-weight: 400 900;
+  font-stretch: 62% 100%;
   font-display: swap;
-  src: url("/fonts/plus-jakarta-sans-latin-wght.woff2") format("woff2");
+  src: url("/fonts/archivo-wdth-wght.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: 'Space Grotesk';
+  font-family: "Plex Mono";
   font-style: normal;
-  font-weight: 700;
+  font-weight: 500;
   font-display: swap;
-  src: url("/fonts/space-grotesk-latin-700.woff2") format("woff2");
+  src: url("/fonts/ibm-plex-mono-500.woff2") format("woff2");
 }
 
 :root {
-  --bg: #090a0f;
-  --card-bg: rgba(12, 13, 16, 0.94);
-  --card-border: rgba(255, 214, 0, 0.42);
-  --accent: #ffd600;
-  --accent-glow: rgba(255, 214, 0, 0.42);
-  --text: #ffffff;
-  --text-muted: #d1d1d1;
-  --font-main: 'Plus Jakarta Sans', sans-serif;
-  --font-display: 'Space Grotesk', sans-serif;
+  --ink: #0d0d0c;
+  --ink-2: #1a1916;
+  --paper: #ece6d6;
+  --paper-2: #e1d9c4;
+  --hazard: #ffd400;
+  --hot: #ff4a1c;
+  --text: #f4f1e8;          /* text on ink */
+  --muted: #b8b2a2;         /* secondary text on ink */
+  --muted-ink: #4a463d;     /* secondary text on paper */
+  --rule: 3px solid var(--ink);
+  --shadow: 6px 6px 0 var(--ink);
+  --font: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --font-mono: "Plex Mono", ui-monospace, "Courier New", monospace;
+  --stripes: repeating-linear-gradient(-45deg, var(--hazard) 0 14px, var(--ink) 14px 28px);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* kept for the effects/count-up and older rules */
+  --accent: var(--hazard);
+  --font-main: var(--font);
+  --font-display: var(--font);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: var(--bg);
+  background: var(--ink);
   color: var(--text);
-  font-family: var(--font-main);
+  font-family: var(--font);
+  font-stretch: 100%;
+  font-size: 1.0625rem;
   line-height: 1.5;
-  padding-bottom: 50px;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Fixed photo layer (replaces background-attachment: fixed, which repaints on scroll).
-   It is a real element (.page-bg, in the header component) so the parallax can move it. */
+/* Fixed photo layer behind the dark sections (a real element so the parallax can move it).
+   Darkened and desaturated: it reads like a photocopied photo, not a glossy background. */
 .page-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   background:
-    linear-gradient(rgba(5, 6, 8, 0.64), rgba(5, 6, 8, 0.78)),
+    radial-gradient(rgba(13, 13, 12, 0.55) 1px, transparent 1.6px) 0 0 / 5px 5px,
+    linear-gradient(rgba(13, 13, 12, 0.72), rgba(13, 13, 12, 0.86)),
     url("/img/bg-800.jpg") center / cover no-repeat;
   background:
-    linear-gradient(rgba(5, 6, 8, 0.64), rgba(5, 6, 8, 0.78)),
+    radial-gradient(rgba(13, 13, 12, 0.55) 1px, transparent 1.6px) 0 0 / 5px 5px,
+    linear-gradient(rgba(13, 13, 12, 0.72), rgba(13, 13, 12, 0.86)),
     image-set(url("/img/bg-800.avif") type("image/avif"), url("/img/bg-800.webp") type("image/webp"), url("/img/bg-800.jpg") type("image/jpeg")) center / cover no-repeat;
+  /* the photo files are already desaturated (scripts/optimize-images.py) */
 }
 
 @media (min-width: 900px) {
   .page-bg {
     background:
-      linear-gradient(rgba(5, 6, 8, 0.64), rgba(5, 6, 8, 0.78)),
+      radial-gradient(rgba(13, 13, 12, 0.55) 1px, transparent 1.6px) 0 0 / 5px 5px,
+      linear-gradient(rgba(13, 13, 12, 0.72), rgba(13, 13, 12, 0.86)),
       url("/img/bg-1600.jpg") center / cover no-repeat;
     background:
-      linear-gradient(rgba(5, 6, 8, 0.64), rgba(5, 6, 8, 0.78)),
+      radial-gradient(rgba(13, 13, 12, 0.55) 1px, transparent 1.6px) 0 0 / 5px 5px,
+      linear-gradient(rgba(13, 13, 12, 0.72), rgba(13, 13, 12, 0.86)),
       image-set(url("/img/bg-1600.avif") type("image/avif"), url("/img/bg-1600.webp") type("image/webp"), url("/img/bg-1600.jpg") type("image/jpeg")) center / cover no-repeat;
   }
 }
 
-.sim-hero {
-  padding: 2.5rem 1.5rem 1.5rem;
-  text-align: center;
-  background: linear-gradient(rgba(8, 9, 11, 0.86), rgba(8, 9, 11, 0.56));
-  border-bottom: 1px solid var(--card-border);
-}
-
-.badge {
-  display: inline-block;
-  padding: 0.3rem 0.8rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
+h1, h2, h3 {
+  font-stretch: 62%;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: rgba(255, 214, 0, 0.14);
-  color: var(--accent);
-  border: 1px solid var(--accent);
-  margin-bottom: 1rem;
+  line-height: 0.9;
+  letter-spacing: -0.005em;
 }
 
-h1 {
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  margin-bottom: 0.8rem;
+/* Small label above a heading: "Faixa 01 · O pacote" (sections are tracks of a setlist). */
+.track {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  margin-bottom: 0.9rem;
+  background: var(--ink);
+  color: var(--hazard);
 }
 
-h1 span {
-  color: var(--accent);
-  text-shadow: 0 0 20px var(--accent-glow);
-}
-
-.sim-hero p {
-  color: var(--text-muted);
-  max-width: 600px;
+/* =====================================================================
+   SIMULATOR — the form is a paper "ficha", the result is a printed receipt
+   ===================================================================== */
+.sim-hero {
+  padding: 2.5rem 1rem 2rem;
+  max-width: 760px;
   margin: 0 auto;
-  font-size: 1rem;
 }
+.sim-hero h1 {
+  font-size: clamp(3.2rem, 13vw, 6.5rem);
+  margin-bottom: 0.75rem;
+}
+.sim-hero h1 span { display: block; color: var(--hazard); }
+.sim-hero p { color: var(--muted); max-width: 46ch; }
 
 .sim-main {
-  max-width: 720px;
-  margin: 2rem auto;
+  max-width: 760px;
+  margin: 0 auto 3rem;
   padding: 0 1rem;
 }
 
 .card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 1rem;
-  padding: 1.75rem;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.58);
-  backdrop-filter: blur(8px);
+  position: relative;
+  background: var(--paper) var(--grain);
+  color: var(--ink);
+  border: var(--rule);
+  padding: 2rem 1.5rem 1.75rem;
+  box-shadow: 10px 10px 0 var(--hazard);
+}
+/* hazard tape across the top of the sheet */
+.card::before {
+  content: "";
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  top: -3px;
+  height: 12px;
+  background: var(--stripes);
+  border-bottom: var(--rule);
 }
 
 .card h2 {
-  font-size: 1.35rem;
-  margin-bottom: 1rem;
+  font-size: clamp(2.2rem, 8vw, 3rem);
+  margin: 0.5rem 0 1rem;
 }
 
 .info-box {
-  background: rgba(255, 255, 255, 0.07);
-  border-left: 4px solid var(--accent);
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-bottom: 1.5rem;
+  border-left: 6px solid var(--ink);
+  padding: 0.25rem 0 0.25rem 0.85rem;
+  font-size: 0.95rem;
+  color: var(--muted-ink);
+  margin-bottom: 1.75rem;
 }
 
-.form-group {
-  margin-bottom: 1.25rem;
-}
+.form-group { margin-bottom: 1.4rem; }
 
 label {
   display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-  color: #ffffff;
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.35rem;
 }
+input + label { margin-top: 0.9rem; }
 
-input + label {
-  margin-top: 0.75rem;
-}
-
-.input-row {
-  display: flex;
-  gap: 0.5rem;
-}
+.input-row { display: flex; gap: 0.6rem; }
 
 input,
-button {
-  font-family: inherit;
-}
+button { font-family: inherit; }
 
 input {
   width: 100%;
-  background: rgba(5, 6, 8, 0.88);
-  border: 1px solid var(--card-border);
-  color: #fff;
-  padding: 0.85rem 1rem;
-  border-radius: 0.6rem;
-  font-size: 1rem;
+  background: #fffdf6;
+  border: var(--rule);
+  border-radius: 0;
+  color: var(--ink);
+  padding: 0.8rem 0.9rem;
+  font-size: 1.05rem;
   outline: none;
-  color-scheme: dark;
+  color-scheme: light;
 }
-
-input:focus {
-  border-color: var(--accent);
-}
-
-input[aria-invalid="true"] {
-  border-color: #ff8585;
-}
+input::placeholder { color: #8a8476; }
+input:focus { box-shadow: 4px 4px 0 var(--hazard), 4px 4px 0 3px var(--ink); }
+input[aria-invalid="true"] { border-color: var(--hot); background: #fff3ee; }
 
 .field-error {
-  color: #ff8585;
-  font-size: 0.85rem;
-  margin-top: 0.4rem;
+  display: inline-block;
+  margin-top: 0.45rem;
+  padding: 0.15rem 0.45rem;
+  background: var(--hot);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
 button.btn-calc {
-  background: var(--accent);
-  color: #111111;
-  font-weight: 700;
-  border: none;
-  padding: 0 1.5rem;
-  border-radius: 0.6rem;
+  background: var(--ink);
+  color: var(--hazard);
+  border: var(--rule);
+  border-radius: 0;
+  padding: 0 1.4rem;
+  font-stretch: 75%;
+  font-weight: 900;
+  font-size: 1.15rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
   cursor: pointer;
   white-space: nowrap;
 }
-
-button.btn-calc:hover {
-  filter: brightness(1.15);
-}
-
-button.btn-calc:disabled {
-  cursor: wait;
-  filter: brightness(0.7);
-}
+button.btn-calc:hover { background: var(--hazard); color: var(--ink); }
+button.btn-calc:disabled { cursor: wait; opacity: 0.7; }
 
 .status-msg {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   margin-top: 0.5rem;
   display: none;
 }
-.status-msg.error { color: #ff8585; display: block; }
-.status-msg.loading { color: var(--accent); display: block; }
+.status-msg.error { color: #b3260b; font-weight: 700; display: block; }
+.status-msg.loading { color: var(--ink); font-family: var(--font-mono); font-size: 0.85rem; display: block; }
 
+/* ---------- Result: a printed receipt ---------- */
 .result-box {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--card-border);
+  margin-top: 2rem;
   display: none;
+  position: relative;
+  background: #fffdf6;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  padding: 1.5rem 1.25rem 2.25rem;
+  border: 2px solid var(--ink);
+  border-bottom: 0;
+  /* torn / zig-zag bottom edge, like paper from a receipt printer */
+  -webkit-mask: linear-gradient(#000 0 0) top / 100% calc(100% - 12px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 18px 12px repeat-x;
+  mask: linear-gradient(#000 0 0) top / 100% calc(100% - 12px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 18px 12px repeat-x;
 }
-
-.result-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.8rem;
-  margin-bottom: 1.5rem;
-}
-
-@media (max-width: 520px) {
-  .result-grid { grid-template-columns: 1fr; }
-}
-
-.result-item {
-  background: rgba(5, 6, 8, 0.82);
-  padding: 0.85rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--card-border);
-}
-
-.result-item span {
+.result-box::before {
+  content: "PAREDÃO 011 — ORÇAMENTO";
   display: block;
-  font-size: 0.75rem;
-  color: var(--text-muted);
+  text-align: center;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  padding-bottom: 0.9rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 2px dashed var(--ink);
 }
 
-.result-item strong {
-  font-size: 1.05rem;
-  color: #ffffff;
+.result-grid { display: grid; gap: 0.35rem; margin-bottom: 1rem; }
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
 }
+.result-item span { font-size: 0.85rem; text-transform: uppercase; color: var(--muted-ink); }
+.result-item strong { font-weight: 500; font-size: 1rem; }
+
+.result-box .form-group { font-family: var(--font); margin: 1rem 0; }
+.result-box label { font-size: 0.85rem; }
 
 .total-banner {
-  background: linear-gradient(135deg, rgba(255, 214, 0, 0.18), rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--accent);
-  padding: 1.25rem;
-  border-radius: 0.75rem;
-  text-align: center;
-  margin-bottom: 1.5rem;
+  border-top: 2px dashed var(--ink);
+  border-bottom: 2px dashed var(--ink);
+  padding: 1rem 0;
+  margin-bottom: 1.25rem;
+  text-align: left;
 }
-
 .total-banner .tag {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--accent);
-  font-weight: 700;
+  letter-spacing: 0.08em;
 }
-
 .total-banner .price {
-  font-family: var(--font-display);
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #ffffff;
+  font-family: var(--font);
+  font-stretch: 62%;
+  font-weight: 900;
+  font-size: clamp(3rem, 14vw, 4.5rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
 }
 
 .btn-whatsapp {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   width: 100%;
-  background: var(--accent);
-  color: #111111;
+  min-height: 56px;
+  padding: 0.9rem 1rem;
+  background: var(--hazard);
+  color: var(--ink);
+  border: var(--rule);
+  box-shadow: var(--shadow);
+  font-family: var(--font);
+  font-stretch: 75%;
+  font-weight: 900;
+  font-size: 1.2rem;
+  text-transform: uppercase;
   text-decoration: none;
-  font-weight: 700;
-  padding: 1rem;
-  border-radius: 0.6rem;
-  font-size: 1rem;
+  text-align: center;
 }
-
+.btn-whatsapp:hover { background: var(--ink); color: var(--hazard); }
 .btn-whatsapp[aria-disabled="true"] {
-  filter: grayscale(1) brightness(0.55);
+  background: var(--paper-2);
+  color: #6f6a5d;
+  border-style: dashed;
+  box-shadow: none;
   cursor: not-allowed;
-}
-
-.btn-whatsapp:hover {
-  filter: brightness(1.1);
 }

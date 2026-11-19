@@ -28,18 +28,29 @@
 
     // Works both ways: scrolling down, elements rise from below; scrolling up, they come down
     // from above. When an element leaves the screen it resets, so it animates again next time.
+    // Elements revealed with clip-path (section titles) are fully clipped while hidden, and the
+    // browser then never reports them as intersecting. For those we observe the parent block
+    // instead and apply the result to the element.
+    var watched = new Map(); // observed element -> elements to update
+    targets.forEach(function (el) {
+        var trigger = el.tagName === "H2" && el.parentElement ? el.parentElement : el;
+        if (!watched.has(trigger)) watched.set(trigger, []);
+        watched.get(trigger).push(el);
+    });
+
     var observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
-            var el = entry.target;
-            if (entry.isIntersecting) {
-                el.classList.add("is-visible");
-            } else {
-                // Left above the viewport -> next entry comes from above (scrolling up).
-                el.classList.toggle("from-above", entry.boundingClientRect.top < 0);
-                el.classList.remove("is-visible");
-            }
+            watched.get(entry.target).forEach(function (el) {
+                if (entry.isIntersecting) {
+                    el.classList.add("is-visible");
+                } else {
+                    // Left above the viewport -> next entry comes from above (scrolling up).
+                    el.classList.toggle("from-above", entry.boundingClientRect.top < 0);
+                    el.classList.remove("is-visible");
+                }
+            });
         });
     }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
 
-    targets.forEach(function (el) { observer.observe(el); });
+    watched.forEach(function (_, trigger) { observer.observe(trigger); });
 })();
