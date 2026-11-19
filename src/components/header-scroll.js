@@ -1,4 +1,4 @@
-// Header steps out of the way while scrolling down and comes back when scrolling up
+// Two small helpers. 1) Header steps out of the way while scrolling down and comes back when scrolling up
 // (more room for the content, especially on phones). Uses a body class; the CSS moves the
 // header with `translate` only. It never hides while the menu is open, while focus is in
 // the header, or near the top of the page. Off with prefers-reduced-motion.
@@ -34,4 +34,22 @@
         if (!frame) frame = requestAnimationFrame(update);
     }, { passive: true });
     header.addEventListener("focusin", function () { setHidden(false); });
+})();
+
+// Floating WhatsApp button: hidden while a block that already has WhatsApp/quote buttons is on
+// screen (hero, final call to action, footer), so it never covers those buttons.
+(function () {
+    "use strict";
+
+    var blocks = document.querySelectorAll("[data-fab-hide]");
+    if (!blocks.length || !("IntersectionObserver" in window)) return;
+    var visible = new Set();
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) visible.add(entry.target);
+            else visible.delete(entry.target);
+        });
+        document.body.classList.toggle("fab-hide", visible.size > 0);
+    }, { threshold: 0.15 });
+    blocks.forEach(function (block) { observer.observe(block); });
 })();

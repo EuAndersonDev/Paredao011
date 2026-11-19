@@ -205,8 +205,32 @@ body.sim-page { padding-bottom: 0; }
 }
 
 .section { padding: 5rem 0; position: relative; }
-.section h2 { font-size: clamp(2.9rem, 9vw, 6.2rem); margin-bottom: 1rem; max-width: 14ch; }
+.section h2 { font-size: clamp(3rem, 11vw, 6.8rem); margin-bottom: 1rem; max-width: 14ch; }
 .section-head { margin-bottom: 2.75rem; }
+.h2-lg, .h2-sm { display: block; }
+.h2-sm {
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: clamp(1.25rem, 3.2vw, 1.9rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+.h2-sm + .h2-lg { margin-top: 0.08em; }
+.h2-lg + .h2-sm { margin-top: 0.35em; }
+/* Desktop: title on the left, intro text on the right, aligned at the bottom (no dead space). */
+@media (min-width: 960px) {
+  .section-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    column-gap: 3rem;
+    align-items: end;
+  }
+  .section-head .track { grid-column: 1 / -1; justify-self: start; }
+  .section-head h2 { margin-bottom: 0; max-width: none; }
+  .section-head .section-lead { padding-bottom: 0.35rem; }
+  .faq-wrap .section-head { display: block; }
+  .faq-wrap .section-head h2 { margin-bottom: 1rem; }
+}
 .section-lead { font-size: 1.15rem; max-width: 52ch; color: var(--muted); }
 .section-lead a { color: inherit; text-decoration-thickness: 2px; text-underline-offset: 3px; }
 
@@ -283,11 +307,11 @@ body.sim-page { padding-bottom: 0; }
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  padding: 3rem 0 3.5rem;
-  min-height: min(88svh, 820px);
+  padding: 2rem 0 3rem;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
 }
+@media (min-width: 1000px) { .hero { min-height: min(88svh, 820px); padding: 3rem 0 3.5rem; } }
 .hero__inner { width: 100%; }
 .hero__kicker {
   display: flex;
@@ -295,11 +319,11 @@ body.sim-page { padding-bottom: 0; }
   gap: 0.5rem;
   margin-bottom: 1.25rem;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   text-transform: uppercase;
 }
 .hero__kicker span { padding: 0.2rem 0.5rem; border: 2px solid var(--hazard); color: var(--hazard); }
-.hero__title { margin-bottom: 1.75rem; }
+.hero__title { margin-bottom: 1.25rem; }
 .hero__line { display: block; overflow: hidden; padding: 0.2em 0 0.04em; margin-top: -0.2em; }
 .hero__line > span { display: block; }
 .hero__l1,
@@ -319,15 +343,61 @@ body.sim-page { padding-bottom: 0; }
   line-height: 1.1;
   color: var(--hazard);
 }
+/* Real photo of the paredão, taped to the poster. Phones: a wide strip under the title;
+   desktop: a tall photo on the right. */
+.hero__photo {
+  position: relative;
+  margin: 0 0 1.5rem;
+  background: #fffdf6;
+  padding: 6px 6px 22px;
+  rotate: -1.2deg;
+  box-shadow: 6px 6px 0 var(--hazard);
+  max-width: 560px;
+}
+.hero__photo::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: -12px;
+  left: 50%;
+  width: 90px;
+  height: 24px;
+  margin-left: -45px;
+  background: rgba(255, 212, 0, 0.85);
+  rotate: 3deg;
+}
+.hero__photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
 .hero__aside { max-width: 560px; }
-.hero__aside > p:first-child { color: var(--text); font-size: 1.15rem; margin-bottom: 1.5rem; }
+/* Phones: the action comes right after the photo, before the paragraph, so it is on the first screen. */
+@media (max-width: 999px) {
+  .hero__aside { display: flex; flex-direction: column; }
+  .hero__actions { order: -1; margin-bottom: 1.25rem; }
+}
+@media (max-width: 999px) and (max-height: 700px) {
+  .hero__photo img { aspect-ratio: 2 / 1; }
+}
+.hero__aside > p:first-child { color: var(--text); font-size: 1.1rem; margin-bottom: 1.25rem; }
 .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.75rem; }
-.hero-note { margin-top: 1.25rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); max-width: 46ch; }
+.hero-note { margin-top: 1.25rem; font-family: var(--font-mono); font-size: 0.875rem; color: var(--muted); max-width: 46ch; }
 @media (min-width: 1000px) {
-  .hero__inner { display: grid; grid-template-columns: minmax(0, 1fr) 380px; align-items: end; gap: 2.5rem; }
-  .hero__kicker { grid-column: 1 / -1; }
-  .hero__title { margin-bottom: 0; }
-  .hero__aside { padding-bottom: 0.5rem; }
+  .hero__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 400px;
+    grid-template-areas: "kicker photo" "title photo" "aside photo";
+    grid-template-rows: auto auto 1fr;
+    column-gap: 3rem;
+  }
+  .hero__kicker { grid-area: kicker; }
+  .hero__title { grid-area: title; margin-bottom: 1.75rem; }
+  .hero__aside { grid-area: aside; }
+  .hero__photo { grid-area: photo; align-self: center; margin: 0; rotate: 2deg; padding: 8px 8px 30px; box-shadow: 10px 10px 0 var(--hazard); }
+  .hero__photo img { aspect-ratio: 4 / 5; }
 }
 
 /* Equalizer: hard-edged yellow bars, no gradients, no glow. */
@@ -478,16 +548,16 @@ body.sim-page { padding-bottom: 0; }
   object-fit: cover;
 }
 @media (min-width: 960px) {
-  .gallery { grid-template-columns: repeat(5, 1fr); gap: 1.25rem; }
-  .gallery figure:first-child { grid-column: auto; }
-  .gallery figure:nth-child(even) { translate: 0 28px; }
+  .gallery { grid-template-columns: 1.35fr 1fr 1fr; gap: 2rem 1.75rem; align-items: start; }
+  .gallery figure:first-child { grid-column: auto; grid-row: span 2; padding: 10px 10px 36px; }
+  .gallery figure:nth-child(3), .gallery figure:nth-child(5) { translate: 0 22px; }
 }
 
 /* ---------- Vídeos (scroll section) ----------
    Base (no JS / reduced motion): intro + a grid of videos with native controls.
    Enhanced (.js, no reduced motion): a sticky full-screen stage driven by video-scroll.js. */
 .video-scroll { padding: 5rem 0; --vs-count: 5; background: var(--ink); }
-.vs-intro h2 { font-size: clamp(2.9rem, 9vw, 6.2rem); margin-bottom: 1rem; }
+.vs-intro h2 { font-size: clamp(3rem, 11vw, 6.8rem); margin-bottom: 1rem; }
 .vs-intro .section-lead { margin-bottom: 0.5rem; }
 .vs-intro__actions { display: flex; flex-wrap: wrap; gap: 0.25rem 1.5rem; margin-top: 0.5rem; margin-bottom: 2rem; }
 .vs-link {
@@ -552,7 +622,7 @@ html:not(.js) .vs-slide:nth-child(5) video { background: #000 url("/videos/publi
     z-index: 3;
     padding-top: 5rem;
   }
-  .js .vs-intro h2 { font-size: clamp(2.6rem, 8vw, 5rem); }
+  .js .vs-intro h2 { font-size: clamp(2.8rem, 9vw, 5.4rem); }
   .js .vs-backdrops { display: block; position: absolute; inset: 0; opacity: 0; }
   .js .vs-backdrop {
     position: absolute;
@@ -620,7 +690,7 @@ html:not(.js) .vs-slide:nth-child(5) video { background: #000 url("/videos/publi
   .vs-hud__counter {
     display: inline-block;
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     padding: 0.1rem 0.4rem;
     background: var(--hazard);
     color: var(--ink);
@@ -777,7 +847,7 @@ html:not(.js) .vs-slide:nth-child(5) video { background: #000 url("/videos/publi
   content: counter(q, decimal-leading-zero);
   font-family: var(--font-mono);
   font-weight: 500;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   flex: none;
 }
 .faq summary::-webkit-details-marker { display: none; }
@@ -827,7 +897,7 @@ html:not(.js) .vs-slide:nth-child(5) video { background: #000 url("/videos/publi
 @media (min-width: 768px) { .site-footer .container { grid-template-columns: 2fr 1fr 1fr; } }
 .site-footer h2 {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 500;
   font-stretch: 100%;
   letter-spacing: 0.04em;
@@ -852,7 +922,7 @@ html:not(.js) .vs-slide:nth-child(5) video { background: #000 url("/videos/publi
   border-top: 2px solid var(--ink);
   padding-top: 1rem;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.875rem;
 }
 
 /* ---------- Floating WhatsApp button: a square tag ---------- */
@@ -861,8 +931,8 @@ html:not(.js) .vs-slide:nth-child(5) video { background: #000 url("/videos/publi
   z-index: 45;
   right: max(1rem, env(safe-area-inset-right));
   bottom: max(1rem, env(safe-area-inset-bottom));
-  width: 58px;
-  height: 58px;
+  width: 52px;
+  height: 52px;
   display: grid;
   place-items: center;
   background: var(--hazard);
@@ -871,7 +941,8 @@ html:not(.js) .vs-slide:nth-child(5) video { background: #000 url("/videos/publi
   box-shadow: 4px 4px 0 var(--ink);
 }
 .wa-fab:hover { background: var(--text); }
-body.menu-open .wa-fab { opacity: 0; visibility: hidden; }
+body.menu-open .wa-fab,
+body.fab-hide .wa-fab { opacity: 0; visibility: hidden; }
 .wa-fab svg { width: 28px; height: 28px; }
 
 /* ---------- Simulator page extras ---------- */
@@ -882,7 +953,7 @@ body.menu-open .wa-fab { opacity: 0; visibility: hidden; }
   align-items: center;
   gap: 0.4rem;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   margin-bottom: 1rem;
   color: var(--muted);
   text-transform: uppercase;
@@ -900,7 +971,7 @@ body.menu-open .wa-fab { opacity: 0; visibility: hidden; }
 
 .privacy-note {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.875rem;
   color: var(--muted-ink);
   margin-top: 0.6rem;
 }
@@ -997,8 +1068,7 @@ button.btn-calc.is-loading::after {
     from { opacity: 0; transform: scale(1.8) rotate(-6deg); }
     to { opacity: 1; transform: none; }
   }
-  .hero__aside { animation: rise 0.7s var(--ease) both 0.5s; }
-  @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  /* (the paragraph and buttons appear without animation: cheaper first paint on phones) */
 
   /* P2 — Hover feedback */
   /* nav: a yellow bar slides in under the link */
@@ -1078,7 +1148,9 @@ button.btn-calc.is-loading::after {
   @keyframes ticker { to { transform: translateX(-50%); } }
 
   /* Stickers and buttons press into the page (the hard shadow "lands") */
-  .sticker, .btn-whatsapp, .wa-fab, .vs-hud__full { transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease), background-color 0.18s var(--ease); }
+  .sticker, .btn-whatsapp, .vs-hud__full { transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease), background-color 0.18s var(--ease); }
+  .wa-fab { transition: opacity 0.3s var(--ease), visibility 0s linear 0s, translate 0.3s var(--ease), background-color 0.18s var(--ease); }
+  body.fab-hide .wa-fab, body.menu-open .wa-fab { translate: 0 14px; transition: opacity 0.3s var(--ease), visibility 0s linear 0.3s, translate 0.3s var(--ease); }
   .sticker:hover, .btn-whatsapp:not([aria-disabled="true"]):hover { transform: translate(-2px, -2px); }
   .sticker:active, .btn-whatsapp:not([aria-disabled="true"]):active { transform: translate(5px, 5px); box-shadow: 1px 1px 0 var(--ink); }
 
