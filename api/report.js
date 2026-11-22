@@ -4,12 +4,12 @@
 // GET /api/report?dry=1         -> returns the e-mail HTML instead of sending it (for testing)
 // GET /api/report?days=7        -> a longer period (1 to 90 days), e.g. a weekly summary
 // Every call needs the header  Authorization: Bearer <CRON_SECRET>  (Vercel Cron sends it).
-// Environment: CRON_SECRET, RESEND_API_KEY, Redis (KV_REST_API_URL / KV_REST_API_TOKEN),
-// optional REPORT_EMAIL (default below) and REPORT_FROM (falls back to RESEND_FROM_EMAIL).
+// Environment: CRON_SECRET, DATABASE_URL (Neon), SMTP_USER + SMTP_PASS (Gmail app password),
+// optional REPORT_EMAIL (default below), REPORT_FROM, SMTP_HOST, SMTP_PORT.
 const stats = require("./_lib/stats.js");
+const mailer = require("./_lib/mailer.js");
 
 const DEFAULT_TO = "paredaoonze@gmail.com";
-const DEFAULT_FROM = "Paredão 011 <onboarding@resend.dev>";
 const HOUR_MS = 60 * 60 * 1000;
 
 const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
@@ -129,29 +129,12 @@ function buildReport(current, previous, hours) {
   return { subject, html, text };
 }
 
-async function sendEmail({ subject, html, text }) {
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      from: process.env.REPORT_FROM || process.env.RESEND_FROM_EMAIL || DEFAULT_FROM,
-      to: [process.env.REPORT_EMAIL || DEFAULT_TO],
-      subject,
-      html,
-      text
-    })
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(`RESEND_${response.status}`);
-  return data.id || null;
-}
-
 module.exports = async function handler(request, response) {
   const secret = process.env.CRON_SECRET;
   if (!secret) return response.status(500).json({ error: "CRON_SECRET_NOT_SET" });
   const auth = (request.headers && request.headers.authorization) || "";
   if (auth !== `Bearer ${secret}`) return response.status(401).json({ error: "UNAUTHORIZED" });
-  if (!stats.isConfigured()) return response.status(503).json({ error: "STATS_STORAGE_NOT_CONFIGURED" });
+  if (!stats.isConfigured()) return response.status(503).json({ error: "DATABASE_NOT_CONFIGURED" });
 
   const query = request.query || {};
   const days = Math.min(90, Math.max(1, parseInt(query.days, 10) || 1));
@@ -165,7 +148,7 @@ module.exports = async function handler(request, response) {
       stats.readHours(hourWindow(now, days * 24, days * 24))
     ]);
   } catch {
-    return response.status(502).json({ error: "STATS_STORAGE_UNAVAILABLE" });
+    return response.status(502).json({ error: "DATABASE_UNAVAILABLE" });
   }
   const report = buildReport(current, previous, hours);
 
@@ -173,9 +156,10 @@ module.exports = async function handler(request, response) {
     response.setHeader("Content-Type", "text/html; charset=utf-8");
     return response.status(200).send(report.html);
   }
-  if (!process.env.RESEND_API_KEY) return response.status(500).json({ error: "RESEND_API_KEY_NOT_SET" });
+  if (!mailer.isConfigured()) return response.status(500).json({ error: "SMTP_NOT_CONFIGURED" });
   try {
-    const id = await sendEmail(report);
+    const id = await mailer.send({ to: process.env.REPORT_EMAIL || DEFAULT_TO, ...report });
+    await stats.cleanup().catch(() => {}); // housekeeping; never blocks the report
     return response.status(200).json({ sent: true, id, subject: report.subject });
   } catch (error) {
     return response.status(502).json({ error: String(error.message || "EMAIL_FAILED") });

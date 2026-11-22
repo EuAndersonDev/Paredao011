@@ -4,7 +4,7 @@
 
 ## Stack e chamadas externas
 
-HTML/CSS/JS puro, sem dependências npm. `scripts/build.mjs` gera `dist/`, publicado pela Vercel, mais uma Vercel Function (`api/trip.js`).
+HTML/CSS/JS puro. Dependências npm só nas funções: `nodemailer` e `@neondatabase/serverless` (versões fixas, sem dependências próprias); `@electric-sql/pglite` só nos testes. `scripts/build.mjs` gera `dist/`, publicado pela Vercel, mais uma Vercel Function (`api/trip.js`).
 
 | Chamada | Onde roda | Chave? |
 |---|---|---|
@@ -13,8 +13,8 @@ HTML/CSS/JS puro, sem dependências npm. `scripts/build.mjs` gera `dist/`, publi
 | `https://routes.googleapis.com/directions/v2:computeRoutes` | Vercel Function | `GOOGLE_MAPS_API_KEY` no cabeçalho `X-Goog-Api-Key` |
 | `https://wa.me/...`, Instagram | links abertos pelo usuário | não |
 | `POST /api/event` (mesma origem) | navegador → Vercel Function | não |
-| Upstash Redis REST (`KV_REST_API_URL`) | Vercel Functions (`api/_lib/redis.js`) | `KV_REST_API_TOKEN` |
-| `https://api.resend.com/emails` | Vercel Function `api/report.js` (Cron diário, 18h) | `RESEND_API_KEY` |
+| Postgres Neon (`DATABASE_URL`) | Vercel Functions (`api/_lib/db.js`) | credencial no `DATABASE_URL` |
+| Gmail SMTP (`smtp.gmail.com:465`, Nodemailer) | Vercel Function `api/report.js` (Cron diário, 18h) | `SMTP_USER` / `SMTP_PASS` (senha de app) |
 
 Fontes, imagens e vídeos são servidos pelo próprio site.
 
@@ -62,10 +62,11 @@ Fontes, imagens e vídeos são servidos pelo próprio site.
 
 ## Estatísticas do relatório (adicionado em 2026-11-22)
 
-- O site passou a guardar **estatísticas anônimas** por hora: número de orçamentos e de confirmações, cidade/UF, faixa de distância, soma dos valores estimados e das durações. Nome, endereço, bairro e rua nunca são guardados; o CEP fica só numa chave temporária de 2 dias, para ligar a confirmação à cidade. O texto de privacidade do simulador foi atualizado para dizer isso.
+- O site passou a guardar **estatísticas anônimas** no Postgres (Neon): uma linha por orçamento e por confirmação, com cidade/UF, distância, duração e valor estimado. Nome, endereço, bairro e rua nunca são guardados; o CEP fica na tabela `recent_quote_ceps` por no máximo 2 dias, para ligar a confirmação à cidade, e é apagado na rotina diária. Eventos com mais de 400 dias também são apagados. O texto de privacidade do simulador foi atualizado para dizer isso.
+- Todas as consultas usam parâmetros (`$1`, `$2`…), nunca texto do usuário concatenado no SQL.
 - `/api/event` aceita só confirmações de CEPs consultados nos últimos 2 dias e valida tamanho e valores, o que dificulta inflar os números. Não há limite de uso; se houver abuso, a mesma regra de rate limit do Firewall da Vercel sugerida para `/api/trip` resolve.
 - `/api/report` (diário, às 18h) exige `Authorization: Bearer CRON_SECRET` (enviado automaticamente pela Vercel Cron) e recusa tudo se o segredo não estiver configurado.
-- Se o Redis não estiver configurado ou cair, o simulador funciona normalmente; só a contagem deixa de acontecer.
+- Se o banco não estiver configurado ou cair, o simulador funciona normalmente (o registro desiste após 2,5 s); só a contagem deixa de acontecer.
 
 ## Observações
 

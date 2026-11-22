@@ -1,109 +1,128 @@
-// Anonymous usage statistics for the weekly report.
-// Only counters are stored, one Redis hash per hour (São Paulo time), so a report can cover
-// any window, e.g. 18:00 yesterday to 18:00 today. Fields of each hash:
-//   q                 quotes calculated (successful /api/trip)
-//   c                 quotes confirmed (click on "Confirmar Orçamento no WhatsApp")
-//   qc:<UF>|<Cidade>  quotes per city        cc:<UF>|<Cidade>  confirmations per city
-//   km:<faixa>        quotes per round-trip distance range
-//   v                 sum of confirmed estimated values, in cents
-//   h                 sum of confirmed event durations, in hundredths of an hour
-// Plus a short-lived key cep:<cep> -> "<UF>|<Cidade>" (2 days) so a confirmation can be tied
-// to the city looked up by /api/trip. No name, address or full CEP is kept in the counters.
-const redis = require("./redis.js");
+// Anonymous usage statistics for the daily report, stored in Postgres (Neon).
+// site_events: one row per quote (successful /api/trip) and per confirmation (click on
+//   "Confirmar Orçamento no WhatsApp"), with city/UF, round-trip km, duration and value.
+// recent_quote_ceps: CEP -> city for 2 days, so a confirmation can be tied to its city.
+// No name, address, street or neighbourhood is stored.
+// Recording never throws and gives up after a short timeout: the simulator must not depend on it.
+const db = require("./db.js");
 
-const HOUR_TTL_SECONDS = 400 * 24 * 60 * 60; // keep ~13 months of counters
-const CEP_TTL_SECONDS = 2 * 24 * 60 * 60;
+const RECORD_TIMEOUT_MS = 2500;
+const CEP_TTL = "2 days";
+const KEEP_EVENTS = "400 days";
 const KM_BUCKETS = [[20, "até 20 km"], [50, "20–50 km"], [100, "50–100 km"], [Infinity, "mais de 100 km"]];
-
-const hourFormatter = new Intl.DateTimeFormat("en-CA", {
-  timeZone: "America/Sao_Paulo",
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-  hour: "2-digit",
-  hourCycle: "h23"
-});
-
-// "stats:2026-11-22:18" = 18:00–18:59 of 22/11 in São Paulo
-function hourKey(date = new Date()) {
-  const p = Object.fromEntries(hourFormatter.formatToParts(date).map((x) => [x.type, x.value]));
-  return `stats:${p.year}-${p.month}-${p.day}:${p.hour}`;
-}
 
 function kmBucket(km) {
   return KM_BUCKETS.find(([limit]) => km <= limit)[1];
 }
 
+// Same buckets in SQL, built from KM_BUCKETS so there is a single definition.
+const KM_BUCKET_SQL = `CASE ${KM_BUCKETS.filter(([l]) => l !== Infinity).map(([l, name]) => `WHEN round_trip_km <= ${l} THEN '${name}'`).join(" ")} ELSE '${KM_BUCKETS[KM_BUCKETS.length - 1][1]}' END`;
+
 function cleanPlace(city, uf) {
-  const c = String(city || "").replace(/[|\r\n]/g, " ").trim().slice(0, 60);
+  const c = String(city || "").replace(/[\r\n]/g, " ").trim().slice(0, 60);
   const u = String(uf || "").replace(/[^A-Za-z]/g, "").toUpperCase().slice(0, 2);
-  return c && u ? `${u}|${c}` : "??|Não identificada";
+  return c && u ? { city: c, uf: u } : { city: "Não identificada", uf: "??" };
 }
 
-// Never throws: statistics must not break the simulator.
-async function safe(commands) {
+function withTimeout(promise) {
+  let timer;
+  const timeout = new Promise((resolve) => { timer = setTimeout(() => resolve(null), RECORD_TIMEOUT_MS); });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
+async function safe(fn) {
+  if (!db.isConfigured()) return null;
   try {
-    return await redis.pipeline(commands);
+    return await withTimeout(fn());
   } catch {
     return null;
   }
 }
 
 function recordQuote({ cep, city, uf, roundTripKm, now = new Date() }) {
-  const key = hourKey(now);
   const place = cleanPlace(city, uf);
-  return safe([
-    ["HINCRBY", key, "q", 1],
-    ["HINCRBY", key, `qc:${place}`, 1],
-    ["HINCRBY", key, `km:${kmBucket(roundTripKm)}`, 1],
-    ["EXPIRE", key, HOUR_TTL_SECONDS],
-    ["SET", `cep:${cep}`, place, "EX", CEP_TTL_SECONDS]
-  ]);
-}
-
-// Returns false when the CEP was never quoted recently (ignored: protects the numbers).
-async function recordConfirm({ cep, hours, totalBRL, now = new Date() }) {
-  const found = await safe([["GET", `cep:${cep}`]]);
-  const place = found && found[0];
-  if (!place) return false;
-  const key = hourKey(now);
-  await safe([
-    ["HINCRBY", key, "c", 1],
-    ["HINCRBY", key, `cc:${place}`, 1],
-    ["HINCRBY", key, "v", Math.round(totalBRL * 100)],
-    ["HINCRBY", key, "h", Math.round(hours * 100)],
-    ["EXPIRE", key, HOUR_TTL_SECONDS]
-  ]);
-  return true;
-}
-
-// Aggregates the hourly hashes for the given hour starts.
-// perHour: [{ key: "2026-11-22:18", quotes, confirms }] in the same order as `hours`.
-async function readHours(hours) {
-  const keys = hours.map((d) => hourKey(d));
-  const rows = (await redis.pipeline(keys.map((k) => ["HGETALL", k]))) || keys.map(() => []);
-  const total = { quotes: 0, confirms: 0, valueBRL: 0, hours: 0, quoteCities: {}, confirmCities: {}, km: {}, perHour: [] };
-
-  rows.forEach((row, i) => {
-    const fields = {};
-    const list = Array.isArray(row) ? row : [];
-    for (let j = 0; j + 1 < list.length; j += 2) fields[list[j]] = Number(list[j + 1]) || 0;
-    const quotes = fields.q || 0;
-    const confirms = fields.c || 0;
-    total.quotes += quotes;
-    total.confirms += confirms;
-    total.valueBRL += (fields.v || 0) / 100;
-    total.hours += (fields.h || 0) / 100;
-    total.perHour.push({ key: keys[i].slice(6), quotes, confirms });
-    for (const [field, value] of Object.entries(fields)) {
-      const bucket = field.startsWith("qc:") ? total.quoteCities : field.startsWith("cc:") ? total.confirmCities : field.startsWith("km:") ? total.km : null;
-      if (bucket) {
-        const name = field.slice(3);
-        bucket[name] = (bucket[name] || 0) + value;
-      }
-    }
+  return safe(async () => {
+    await db.query(
+      "INSERT INTO site_events (created_at, kind, uf, city, round_trip_km) VALUES ($1, 'quote', $2, $3, $4)",
+      [now.toISOString(), place.uf, place.city, Math.round(roundTripKm * 10) / 10]
+    );
+    await db.query(
+      `INSERT INTO recent_quote_ceps (cep, uf, city, seen_at) VALUES ($1, $2, $3, $4)
+       ON CONFLICT (cep) DO UPDATE SET uf = EXCLUDED.uf, city = EXCLUDED.city, seen_at = EXCLUDED.seen_at`,
+      [cep, place.uf, place.city, now.toISOString()]
+    );
+    return true;
   });
+}
+
+// Returns true when recorded; false when the CEP was not quoted in the last 2 days (ignored,
+// so made-up requests can't inflate the numbers) or when the database is unavailable.
+async function recordConfirm({ cep, hours, totalBRL, now = new Date() }) {
+  const result = await safe(async () => {
+    const rows = await db.query(
+      `SELECT uf, city FROM recent_quote_ceps WHERE cep = $1 AND seen_at > $2::timestamptz - interval '${CEP_TTL}'`,
+      [cep, now.toISOString()]
+    );
+    if (!rows.length) return false;
+    await db.query(
+      "INSERT INTO site_events (created_at, kind, uf, city, hours, total_brl) VALUES ($1, 'confirm', $2, $3, $4, $5)",
+      [now.toISOString(), rows[0].uf, rows[0].city, Math.round(hours * 100) / 100, Math.round(totalBRL * 100) / 100]
+    );
+    return true;
+  });
+  return result === true;
+}
+
+// Aggregates the window [hours[0], hours[last] + 1 h). Same shape as the report expects:
+// totals, cities as "UF|Cidade" -> count, km ranges, and perHour aligned with `hours`.
+async function readHours(hours) {
+  const start = hours[0].toISOString();
+  const end = new Date(hours[hours.length - 1].getTime() + 3600000).toISOString();
+  const range = "created_at >= $1 AND created_at < $2";
+
+  const [totals] = await db.query(
+    `SELECT count(*) FILTER (WHERE kind = 'quote') AS quotes,
+            count(*) FILTER (WHERE kind = 'confirm') AS confirms,
+            coalesce(sum(total_brl) FILTER (WHERE kind = 'confirm'), 0) AS value,
+            coalesce(sum(hours) FILTER (WHERE kind = 'confirm'), 0) AS hours
+       FROM site_events WHERE ${range}`, [start, end]);
+  const cities = await db.query(
+    `SELECT kind, uf, city, count(*) AS n FROM site_events WHERE ${range} GROUP BY kind, uf, city`, [start, end]);
+  const km = await db.query(
+    `SELECT ${KM_BUCKET_SQL} AS bucket, count(*) AS n FROM site_events WHERE ${range} AND kind = 'quote' GROUP BY 1`, [start, end]);
+  const perHour = await db.query(
+    `SELECT floor(extract(epoch FROM created_at) / 3600) AS h,
+            count(*) FILTER (WHERE kind = 'quote') AS quotes,
+            count(*) FILTER (WHERE kind = 'confirm') AS confirms
+       FROM site_events WHERE ${range} GROUP BY 1`, [start, end]);
+
+  const total = {
+    quotes: Number(totals.quotes),
+    confirms: Number(totals.confirms),
+    valueBRL: Number(totals.value),
+    hours: Number(totals.hours),
+    quoteCities: {},
+    confirmCities: {},
+    km: {},
+    perHour: []
+  };
+  for (const row of cities) {
+    const bucket = row.kind === "quote" ? total.quoteCities : total.confirmCities;
+    bucket[`${row.uf}|${row.city}`] = Number(row.n);
+  }
+  for (const row of km) total.km[row.bucket] = Number(row.n);
+  const byHour = new Map(perHour.map((row) => [Number(row.h), row]));
+  for (const hour of hours) {
+    const row = byHour.get(Math.floor(hour.getTime() / 3600000));
+    total.perHour.push({ quotes: row ? Number(row.quotes) : 0, confirms: row ? Number(row.confirms) : 0 });
+  }
   return total;
 }
 
-module.exports = { recordQuote, recordConfirm, readHours, hourKey, kmBucket, cleanPlace, isConfigured: redis.isConfigured };
+// Housekeeping, run with the daily report: forget CEPs after 2 days, events after ~13 months.
+async function cleanup(now = new Date()) {
+  await db.query(`DELETE FROM recent_quote_ceps WHERE seen_at < $1::timestamptz - interval '${CEP_TTL}'`, [now.toISOString()]);
+  await db.query(`DELETE FROM site_events WHERE created_at < $1::timestamptz - interval '${KEEP_EVENTS}'`, [now.toISOString()]);
+}
+
+module.exports = { recordQuote, recordConfirm, readHours, cleanup, kmBucket, cleanPlace, isConfigured: db.isConfigured };

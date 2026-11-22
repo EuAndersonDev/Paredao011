@@ -1,6 +1,6 @@
 // Prices, fees and the origin CEP are shared with the site through src/config.js.
 const SITE_CONFIG = require("../src/config.js");
-// Anonymous counters for the weekly e-mail report (no-op when Redis is not configured).
+// Anonymous statistics for the daily e-mail report (no-op when the database is not configured).
 const stats = require("./_lib/stats.js");
 
 const CONFIG = Object.freeze({
