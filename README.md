@@ -34,10 +34,36 @@ Depois de editar, rode `npm run check`. Os testes usam uma tabela de preços pr�
 - Variável de ambiente: **`GOOGLE_MAPS_API_KEY`** (Settings → Environment Variables). Fica só no servidor; não use prefixo público.
 - `vercel.json` já define o build (`npm run build` → `dist/`), URLs limpas, redirecionamento e cabeçalhos de segurança, incluindo a Content-Security-Policy. Se o script inline das páginas mudar, o teste avisa que o hash da CSP precisa ser atualizado.
 
+## Relatório semanal por e-mail
+
+Toda segunda, às 08:07 (horário de Brasília), a Vercel chama `/api/report`, que envia para **paredaoonze@gmail.com** um resumo dos últimos 7 dias:
+orçamentos calculados, confirmações no WhatsApp, taxa de conversão, valor estimado, ticket médio, cidades, distâncias e números dia a dia.
+
+O site guarda só **estatísticas anônimas** (contagens, cidade/UF, faixa de distância, valor estimado e duração); nunca nome, endereço ou CEP completo nos contadores.
+
+Para funcionar, configure uma vez:
+
+1. **Banco (Upstash Redis, grátis):** Vercel → projeto → *Storage* → *Create Database* → **Upstash for Redis** → conecte ao projeto. Isso cria `KV_REST_API_URL` e `KV_REST_API_TOKEN`.
+2. **E-mail (Resend, grátis):** crie a conta em resend.com **com o e-mail paredaoonze@gmail.com** (sem domínio próprio, o Resend só envia para o e-mail da conta), gere uma *API key* e salve na Vercel como `RESEND_API_KEY`.
+3. **Segredo do agendamento:** na Vercel, crie `CRON_SECRET` com um texto aleatório longo (ex.: gerado por um gerenciador de senhas).
+4. Opcional: `REPORT_EMAIL` (outro destinatário) e `REPORT_FROM` (remetente, se tiver domínio verificado no Resend).
+5. Faça um novo deploy de produção. Os agendamentos só rodam em produção.
+
+Testar sem esperar a segunda (troque `SEU_SEGREDO`):
+
+```bash
+curl -H "Authorization: Bearer SEU_SEGREDO" "https://paredao011.vercel.app/api/report?dry=1" > relatorio.html
+```
+
+Sem `dry=1` o e-mail é enviado na hora. `days=30` gera o relatório dos últimos 30 dias.
+
 ## Estrutura
 
 ```
 api/trip.js        função Vercel: CEP -> distância de ida/volta e pedágios (usa a chave)
+api/event.js       função Vercel: registra a confirmação no WhatsApp (estatística anônima)
+api/report.js      função Vercel: relatório semanal por e-mail (Vercel Cron + Resend)
+api/_lib/          Redis (Upstash) e estatísticas, usados pelas funções
 src/config.js      preços, taxas, contato, SITE_URL (único arquivo de configuração)
 src/lib/           funções puras: pricing, whatsapp, datetime, format
 src/simulator/     formulário, exibição do resultado, controle e efeitos do simulador

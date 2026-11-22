@@ -12,6 +12,9 @@ HTML/CSS/JS puro, sem dependências npm. `scripts/build.mjs` gera `dist/`, publi
 | `https://viacep.com.br/ws/{cep}/json/` | Vercel Function | não |
 | `https://routes.googleapis.com/directions/v2:computeRoutes` | Vercel Function | `GOOGLE_MAPS_API_KEY` no cabeçalho `X-Goog-Api-Key` |
 | `https://wa.me/...`, Instagram | links abertos pelo usuário | não |
+| `POST /api/event` (mesma origem) | navegador → Vercel Function | não |
+| Upstash Redis REST (`KV_REST_API_URL`) | Vercel Functions (`api/_lib/redis.js`) | `KV_REST_API_TOKEN` |
+| `https://api.resend.com/emails` | Vercel Function `api/report.js` (Cron semanal) | `RESEND_API_KEY` |
 
 Fontes, imagens e vídeos são servidos pelo próprio site.
 
@@ -56,6 +59,13 @@ Fontes, imagens e vídeos são servidos pelo próprio site.
 | Baixa | "Regiões atendidas" mostra só "Grande São Paulo". | Preencher `BUSINESS.cities` em `src/config.js`. |
 | Info | Placa do caminhão e rostos aparecem nos vídeos. | Confirmar autorização de quem aparece. |
 | Info | Eventos de vários dias mostram só a data de início na mensagem do WhatsApp. | Decisão de negócio. |
+
+## Estatísticas do relatório (adicionado em 2026-11-22)
+
+- O site passou a guardar **estatísticas anônimas** por dia: número de orçamentos e de confirmações, cidade/UF, faixa de distância, soma dos valores estimados e das durações. Nome, endereço, bairro e rua nunca são guardados; o CEP fica só numa chave temporária de 2 dias, para ligar a confirmação à cidade. O texto de privacidade do simulador foi atualizado para dizer isso.
+- `/api/event` aceita só confirmações de CEPs consultados nos últimos 2 dias e valida tamanho e valores, o que dificulta inflar os números. Não há limite de uso; se houver abuso, a mesma regra de rate limit do Firewall da Vercel sugerida para `/api/trip` resolve.
+- `/api/report` exige `Authorization: Bearer CRON_SECRET` (enviado automaticamente pela Vercel Cron) e recusa tudo se o segredo não estiver configurado.
+- Se o Redis não estiver configurado ou cair, o simulador funciona normalmente; só a contagem deixa de acontecer.
 
 ## Observações
 
