@@ -44,9 +44,9 @@ O site guarda só **estatísticas anônimas** (contagens, cidade/UF, faixa de di
 Para funcionar, configure uma vez:
 
 1. **Banco (Upstash Redis, grátis):** Vercel → projeto → *Storage* → *Create Database* → **Upstash for Redis** → conecte ao projeto. Isso cria `KV_REST_API_URL` e `KV_REST_API_TOKEN`.
-2. **E-mail (Resend, grátis):** crie a conta em resend.com **com o e-mail paredaoonze@gmail.com** (sem domínio próprio, o Resend só envia para o e-mail da conta), gere uma *API key* e salve na Vercel como `RESEND_API_KEY`.
+2. **E-mail (Resend):** `RESEND_API_KEY` e `RESEND_FROM_EMAIL` (remetente) já estão na Vercel. Sem domínio próprio verificado no Resend, ele só entrega para o e-mail dono da conta: a conta precisa ser a de **paredaoonze@gmail.com**, ou o domínio do remetente precisa estar verificado.
 3. **Segredo do agendamento:** na Vercel, crie `CRON_SECRET` com um texto aleatório longo (ex.: gerado por um gerenciador de senhas).
-4. Opcional: `REPORT_EMAIL` (outro destinatário) e `REPORT_FROM` (remetente, se tiver domínio verificado no Resend).
+4. Opcional: `REPORT_EMAIL` (outro destinatário) e `REPORT_FROM` (outro remetente; por padrão usa `RESEND_FROM_EMAIL`).
 5. Faça um novo deploy de produção. Os agendamentos só rodam em produção.
 
 Testar sem esperar a segunda (troque `SEU_SEGREDO`):

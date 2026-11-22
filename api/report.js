@@ -4,7 +4,7 @@
 // GET /api/report?days=30       -> another period (1 to 90 days)
 // Every call needs the header  Authorization: Bearer <CRON_SECRET>  (Vercel Cron sends it).
 // Environment: CRON_SECRET, RESEND_API_KEY, Redis (KV_REST_API_URL / KV_REST_API_TOKEN),
-// optional REPORT_EMAIL (default below) and REPORT_FROM.
+// optional REPORT_EMAIL (default below) and REPORT_FROM (falls back to RESEND_FROM_EMAIL).
 const stats = require("./_lib/stats.js");
 
 const DEFAULT_TO = "paredaoonze@gmail.com";
@@ -107,7 +107,7 @@ async function sendEmail({ subject, html, text }) {
     method: "POST",
     headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: process.env.REPORT_FROM || DEFAULT_FROM,
+      from: process.env.REPORT_FROM || process.env.RESEND_FROM_EMAIL || DEFAULT_FROM,
       to: [process.env.REPORT_EMAIL || DEFAULT_TO],
       subject,
       html,

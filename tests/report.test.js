@@ -127,6 +127,7 @@ test("/api/report sends last week's numbers to the business e-mail", async () =>
   assert.equal(emails.length, 1);
   const mail = emails[0].body;
   assert.deepEqual(mail.to, ["paredaoonze@gmail.com"]);
+  assert.equal(mail.from, "Paredão 011 <onboarding@resend.dev>", "default sender when RESEND_FROM_EMAIL is not set");
   assert.equal(emails[0].headers.Authorization, "Bearer resend-key-test");
   assert.match(mail.subject, /3 orçamentos e 1 confirmado/);
   assert.match(mail.html, /Guarulhos – SP/);
