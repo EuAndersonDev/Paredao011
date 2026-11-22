@@ -1,5 +1,6 @@
 // Anonymous usage statistics for the weekly report.
-// Only counters are stored, one Redis hash per day (São Paulo time):
+// Only counters are stored, one Redis hash per hour (São Paulo time), so a report can cover
+// any window, e.g. 18:00 yesterday to 18:00 today. Fields of each hash:
 //   q                 quotes calculated (successful /api/trip)
 //   c                 quotes confirmed (click on "Confirmar Orçamento no WhatsApp")
 //   qc:<UF>|<Cidade>  quotes per city        cc:<UF>|<Cidade>  confirmations per city
@@ -10,19 +11,23 @@
 // to the city looked up by /api/trip. No name, address or full CEP is kept in the counters.
 const redis = require("./redis.js");
 
-const DAY_TTL_SECONDS = 400 * 24 * 60 * 60; // keep ~13 months of daily counters
+const HOUR_TTL_SECONDS = 400 * 24 * 60 * 60; // keep ~13 months of counters
 const CEP_TTL_SECONDS = 2 * 24 * 60 * 60;
 const KM_BUCKETS = [[20, "até 20 km"], [50, "20–50 km"], [100, "50–100 km"], [Infinity, "mais de 100 km"]];
 
-const dayFormatter = new Intl.DateTimeFormat("en-CA", {
+const hourFormatter = new Intl.DateTimeFormat("en-CA", {
   timeZone: "America/Sao_Paulo",
   year: "numeric",
   month: "2-digit",
-  day: "2-digit"
+  day: "2-digit",
+  hour: "2-digit",
+  hourCycle: "h23"
 });
 
-function dayKey(date = new Date()) {
-  return `stats:${dayFormatter.format(date)}`;
+// "stats:2026-11-22:18" = 18:00–18:59 of 22/11 in São Paulo
+function hourKey(date = new Date()) {
+  const p = Object.fromEntries(hourFormatter.formatToParts(date).map((x) => [x.type, x.value]));
+  return `stats:${p.year}-${p.month}-${p.day}:${p.hour}`;
 }
 
 function kmBucket(km) {
@@ -45,13 +50,13 @@ async function safe(commands) {
 }
 
 function recordQuote({ cep, city, uf, roundTripKm, now = new Date() }) {
-  const key = dayKey(now);
+  const key = hourKey(now);
   const place = cleanPlace(city, uf);
   return safe([
     ["HINCRBY", key, "q", 1],
     ["HINCRBY", key, `qc:${place}`, 1],
     ["HINCRBY", key, `km:${kmBucket(roundTripKm)}`, 1],
-    ["EXPIRE", key, DAY_TTL_SECONDS],
+    ["EXPIRE", key, HOUR_TTL_SECONDS],
     ["SET", `cep:${cep}`, place, "EX", CEP_TTL_SECONDS]
   ]);
 }
@@ -61,22 +66,23 @@ async function recordConfirm({ cep, hours, totalBRL, now = new Date() }) {
   const found = await safe([["GET", `cep:${cep}`]]);
   const place = found && found[0];
   if (!place) return false;
-  const key = dayKey(now);
+  const key = hourKey(now);
   await safe([
     ["HINCRBY", key, "c", 1],
     ["HINCRBY", key, `cc:${place}`, 1],
     ["HINCRBY", key, "v", Math.round(totalBRL * 100)],
     ["HINCRBY", key, "h", Math.round(hours * 100)],
-    ["EXPIRE", key, DAY_TTL_SECONDS]
+    ["EXPIRE", key, HOUR_TTL_SECONDS]
   ]);
   return true;
 }
 
-// Aggregates the daily hashes for the given dates.
-async function readDays(dates) {
-  const keys = dates.map((d) => dayKey(d));
+// Aggregates the hourly hashes for the given hour starts.
+// perHour: [{ key: "2026-11-22:18", quotes, confirms }] in the same order as `hours`.
+async function readHours(hours) {
+  const keys = hours.map((d) => hourKey(d));
   const rows = (await redis.pipeline(keys.map((k) => ["HGETALL", k]))) || keys.map(() => []);
-  const total = { quotes: 0, confirms: 0, valueBRL: 0, hours: 0, quoteCities: {}, confirmCities: {}, km: {}, perDay: [] };
+  const total = { quotes: 0, confirms: 0, valueBRL: 0, hours: 0, quoteCities: {}, confirmCities: {}, km: {}, perHour: [] };
 
   rows.forEach((row, i) => {
     const fields = {};
@@ -88,7 +94,7 @@ async function readDays(dates) {
     total.confirms += confirms;
     total.valueBRL += (fields.v || 0) / 100;
     total.hours += (fields.h || 0) / 100;
-    total.perDay.push({ day: keys[i].slice(6), quotes, confirms });
+    total.perHour.push({ key: keys[i].slice(6), quotes, confirms });
     for (const [field, value] of Object.entries(fields)) {
       const bucket = field.startsWith("qc:") ? total.quoteCities : field.startsWith("cc:") ? total.confirmCities : field.startsWith("km:") ? total.km : null;
       if (bucket) {
@@ -100,4 +106,4 @@ async function readDays(dates) {
   return total;
 }
 
-module.exports = { recordQuote, recordConfirm, readDays, dayKey, kmBucket, cleanPlace, isConfigured: redis.isConfigured };
+module.exports = { recordQuote, recordConfirm, readHours, hourKey, kmBucket, cleanPlace, isConfigured: redis.isConfigured };
