@@ -1,5 +1,7 @@
 // Prices, fees and the origin CEP are shared with the site through src/config.js.
 const SITE_CONFIG = require("../src/config.js");
+// Anonymous statistics for the daily e-mail report (no-op when the database is not configured).
+const stats = require("./_lib/stats.js");
 
 const CONFIG = Object.freeze({
   ORIGIN_CEP: SITE_CONFIG.ORIGIN_CEP,
@@ -35,15 +37,15 @@ async function buscarEndereco(cep, signal) {
     "Brasil"
   ].filter(Boolean);
 
-  return addressParts.join(", ");
+  return { address: addressParts.join(", "), city: data.localidade || "", uf: data.uf || "" };
 }
 
 async function getOriginAddress(signal) {
   if (originAddressCache) return originAddressCache;
-  const address = await buscarEndereco(CONFIG.ORIGIN_CEP, signal);
-  if (!address) throw new Error("UPSTREAM_ERROR");
-  originAddressCache = address;
-  return address;
+  const found = await buscarEndereco(CONFIG.ORIGIN_CEP, signal);
+  if (!found) throw new Error("UPSTREAM_ERROR");
+  originAddressCache = found.address;
+  return originAddressCache;
 }
 
 function construirBodyRoute(origin, destination) {
@@ -130,6 +132,19 @@ function totalizarPedagios(outbound, returning) {
   };
 }
 
+// Every successful quote (fresh or from cache) is counted once for the report.
+async function sendTrip(response, cep, result, place) {
+  if (result.status === 200 && place) {
+    await stats.recordQuote({
+      cep,
+      city: place.city,
+      uf: place.uf,
+      roundTripKm: result.body.outboundKm + result.body.returnKm
+    });
+  }
+  return response.status(result.status).json(result.body);
+}
+
 module.exports = async function handler(request, response) {
   if (request.method !== "POST") {
     response.setHeader("Allow", "POST");
@@ -183,7 +198,7 @@ module.exports = async function handler(request, response) {
   const cachedResult = resultCache.get(cep);
   if (cachedResult) {
     if (cachedResult.expiresAt > now) {
-      return response.status(200).json(cachedResult.body);
+      return sendTrip(response, cep, { status: 200, body: cachedResult.body }, cachedResult.place);
     }
     resultCache.delete(cep);
   }
@@ -199,7 +214,7 @@ module.exports = async function handler(request, response) {
   const inFlight = inFlightRequests.get(cep);
   if (inFlight) {
     const result = await inFlight;
-    return response.status(result.status).json(result.body);
+    return sendTrip(response, cep, result, result.place);
   }
 
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -212,8 +227,8 @@ module.exports = async function handler(request, response) {
     const timeout = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT_MS);
 
     try {
-      const destinationAddress = await buscarEndereco(cep, controller.signal);
-      if (!destinationAddress) {
+      const destination = await buscarEndereco(cep, controller.signal);
+      if (!destination) {
         // Same size limit as the result cache, so the list cannot grow without bound.
         if (negativeCache.size >= CONFIG.CACHE_MAX_ENTRIES) {
           const oldestCep = negativeCache.keys().next().value;
@@ -223,6 +238,8 @@ module.exports = async function handler(request, response) {
         return { status: 404, body: { error: "CEP_NOT_FOUND" } };
       }
 
+      const destinationAddress = destination.address;
+      const place = { city: destination.city, uf: destination.uf };
       const originAddress = await getOriginAddress(controller.signal);
       const [outbound, returning] = await Promise.all([
         buscarRota(originAddress, destinationAddress, apiKey, controller.signal),
@@ -244,11 +261,12 @@ module.exports = async function handler(request, response) {
         }
         resultCache.set(cep, {
           body: result,
+          place,
           expiresAt: Date.now() + CONFIG.CACHE_TTL_MS
         });
       }
 
-      return { status: 200, body: result };
+      return { status: 200, body: result, place };
     } catch {
       return { status: 502, body: { error: "UPSTREAM_ERROR" } };
     } finally {
@@ -259,5 +277,5 @@ module.exports = async function handler(request, response) {
 
   inFlightRequests.set(cep, requestPromise);
   const result = await requestPromise;
-  return response.status(result.status).json(result.body);
+  return sendTrip(response, cep, result, result.place);
 };

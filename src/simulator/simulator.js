@@ -206,5 +206,27 @@
         }
     }
 
+    // Anonymous count for the weekly report: city (looked up by the server from the CEP),
+    // duration and estimated value. Name and address are never sent.
+    const whatsappButton = document.getElementById("btn-whats");
+    whatsappButton.addEventListener("click", () => {
+        if (whatsappButton.getAttribute("aria-disabled") === "true" || !currentQuote || !currentQuote.totalBRL) return;
+        const payload = JSON.stringify({
+            type: "confirm",
+            cep: currentQuote.cep,
+            hours: currentQuote.hours,
+            totalBRL: currentQuote.totalBRL
+        });
+        try {
+            if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+                navigator.sendBeacon("/api/event", new Blob([payload], { type: "application/json" }));
+            } else {
+                fetch("/api/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: payload, keepalive: true }).catch(() => {});
+            }
+        } catch {
+            // statistics are optional
+        }
+    });
+
     form.init({ onCalculate, onManualToll, onEdit: view.clearFieldError });
 })(typeof globalThis !== "undefined" ? globalThis : this);
