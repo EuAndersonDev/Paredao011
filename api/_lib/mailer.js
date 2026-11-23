@@ -5,6 +5,12 @@ const nodemailer = require("nodemailer");
 
 let transport = null;
 
+// Google shows app passwords as "abcd efgh ijkl mnop"; the real password has no spaces.
+// Removing all whitespace makes a pasted value with spaces or a trailing newline work.
+function cleanPassword(value) {
+  return String(value || "").replace(/\s+/g, "");
+}
+
 function isConfigured() {
   return Boolean(transport || (process.env.SMTP_USER && process.env.SMTP_PASS));
 }
@@ -16,7 +22,7 @@ function getTransport() {
       host: process.env.SMTP_HOST || "smtp.gmail.com",
       port,
       secure: port === 465,
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+      auth: { user: String(process.env.SMTP_USER || "").trim(), pass: cleanPassword(process.env.SMTP_PASS) },
       connectionTimeout: 10000,
       greetingTimeout: 10000,
       socketTimeout: 20000
@@ -36,4 +42,4 @@ function _setTransport(t) {
   transport = t;
 }
 
-module.exports = { send, isConfigured, _setTransport };
+module.exports = { send, isConfigured, cleanPassword, _setTransport };

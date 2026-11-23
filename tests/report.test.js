@@ -174,3 +174,9 @@ test("cron runs every day at 18:00 in São Paulo", () => {
   const vercel = JSON.parse(require("node:fs").readFileSync(require("node:path").join(__dirname, "../vercel.json"), "utf8"));
   assert.deepEqual(vercel.crons, [{ path: "/api/report", schedule: "0 21 * * *" }]); // 21:00 UTC = 18:00 BRT
 });
+
+test("SMTP password: spaces and line breaks from copy/paste are removed", () => {
+  assert.equal(mailer.cleanPassword("abcd efgh ijkl mnop\n"), "abcdefghijklmnop");
+  assert.equal(mailer.cleanPassword(" a b c d "), "abcd");
+  assert.equal(mailer.cleanPassword(undefined), "");
+});
